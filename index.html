@@ -320,7 +320,6 @@ let state=loadState();
 
 let moveTimer=null;
 let petStep=0;
-let appBooted=false;
 
 const petPositions=[50,40,32,44,58,66,54,50];
 
@@ -360,7 +359,7 @@ function saveState(){
   localStorage.setItem("kaizenKnight",JSON.stringify(state));
 }
 
-function playBeep(freq=440,duration=100,volume=.08){
+function playBeep(freq=440,duration=100,volume=.12){
   try{
     const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
     const oscillator=audioCtx.createOscillator();
@@ -381,24 +380,28 @@ function playBeep(freq=440,duration=100,volume=.08){
 }
 
 function playTick(){
-  playBeep(700,35,.035);
+  playBeep(700,45,.10);
 }
 
 function playVictory(){
-  playBeep(523,120,.08);
-  setTimeout(()=>playBeep(659,120,.08),140);
-  setTimeout(()=>playBeep(784,220,.08),280);
+  playBeep(523,130,.13);
+  setTimeout(()=>playBeep(659,130,.13),150);
+  setTimeout(()=>playBeep(784,240,.14),300);
 }
 
 function playFailure(){
-  playBeep(180,220,.08);
+  playBeep(180,260,.13);
+}
+
+function playMenu(){
+  playBeep(500,90,.11);
 }
 
 function playBoot(){
-  playBeep(196,70,.045);
-  setTimeout(()=>playBeep(294,80,.045),110);
-  setTimeout(()=>playBeep(392,90,.045),220);
-  setTimeout(()=>playBeep(523,120,.05),360);
+  playBeep(196,90,.14);
+  setTimeout(()=>playBeep(294,100,.14),120);
+  setTimeout(()=>playBeep(392,110,.14),250);
+  setTimeout(()=>playBeep(523,150,.15),400);
 }
 
 function renderDays(){
@@ -471,7 +474,6 @@ function showBoot(){
 
   setTimeout(()=>{
     document.getElementById("screen").classList.remove("boot-dark");
-    appBooted=true;
     showMain(true);
   },1100);
 }
@@ -543,7 +545,7 @@ function showChecklist(){
     return;
   }
 
-  playBeep(500,80,.06);
+  playMenu();
 
   let checks=state.checks[todayIndex];
 
@@ -608,7 +610,7 @@ function lockInDay(){
 function showWeek(){
   stopPet();
 
-  playBeep(380,80,.06);
+  playMenu();
   renderDays();
 
   let clean=state.statuses.filter(s=>s==="complete").length;
@@ -630,7 +632,7 @@ function showWeek(){
 function resetWeek(){
   stopPet();
 
-  playBeep(220,140,.08);
+  playBeep(220,180,.13);
   state=freshState();
   saveState();
   showMain();
