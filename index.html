@@ -42,6 +42,7 @@
       box-sizing:border-box;
     }
 
+    .screen.off,
     .screen.boot-dark{
       background:#111;
     }
@@ -57,6 +58,7 @@
       flex-shrink:0;
     }
 
+    .off .status-bar,
     .boot-dark .status-bar{
       color:#e9ecd8;
       border-bottom:4px solid #e9ecd8;
@@ -71,6 +73,16 @@
       align-items:center;
       box-sizing:border-box;
       overflow:hidden;
+    }
+
+    .power-btn{
+      background:#e9ecd8;
+      color:#111;
+      border:4px solid #e9ecd8;
+      font-family:'VT323', monospace;
+      font-size:34px;
+      padding:8px 22px;
+      box-shadow:none;
     }
 
     .boot-text{
@@ -274,10 +286,10 @@
 
 <div class="device">
 
-  <div class="screen boot-dark" id="screen">
-    <div class="status-bar" id="statusBar">POWER</div>
+  <div class="screen off" id="screen">
+    <div class="status-bar" id="statusBar">POWER OFF</div>
     <div class="play-area" id="playArea">
-      <div class="boot-text">BOOTING...</div>
+      <button class="power-btn" onclick="powerOn()">POWER</button>
     </div>
   </div>
 
@@ -320,6 +332,8 @@ let state=loadState();
 
 let moveTimer=null;
 let petStep=0;
+let audioCtx=null;
+let poweredOn=false;
 
 const petPositions=[50,40,32,44,58,66,54,50];
 
@@ -359,49 +373,66 @@ function saveState(){
   localStorage.setItem("kaizenKnight",JSON.stringify(state));
 }
 
+function unlockAudio(){
+  if(!audioCtx){
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  }
+
+  if(audioCtx.state==="suspended"){
+    audioCtx.resume();
+  }
+}
+
 function playBeep(freq=440,duration=100,volume=.12){
-  try{
-    const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    const oscillator=audioCtx.createOscillator();
-    const gainNode=audioCtx.createGain();
+  if(!audioCtx) return;
 
-    oscillator.type="square";
-    oscillator.frequency.value=freq;
+  const oscillator=audioCtx.createOscillator();
+  const gainNode=audioCtx.createGain();
 
-    gainNode.gain.setValueAtTime(volume,audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration/1000);
+  oscillator.type="square";
+  oscillator.frequency.value=freq;
 
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+  gainNode.gain.setValueAtTime(volume,audioCtx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration/1000);
 
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime+duration/1000);
-  }catch(e){}
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime+duration/1000);
 }
 
 function playTick(){
-  playBeep(700,45,.10);
+  playBeep(700,45,.12);
 }
 
 function playVictory(){
-  playBeep(523,130,.13);
-  setTimeout(()=>playBeep(659,130,.13),150);
-  setTimeout(()=>playBeep(784,240,.14),300);
+  playBeep(523,130,.14);
+  setTimeout(()=>playBeep(659,130,.14),150);
+  setTimeout(()=>playBeep(784,240,.15),300);
 }
 
 function playFailure(){
-  playBeep(180,260,.13);
+  playBeep(180,260,.15);
 }
 
 function playMenu(){
-  playBeep(500,90,.11);
+  playBeep(500,90,.13);
 }
 
 function playBoot(){
-  playBeep(196,90,.14);
-  setTimeout(()=>playBeep(294,100,.14),120);
-  setTimeout(()=>playBeep(392,110,.14),250);
-  setTimeout(()=>playBeep(523,150,.15),400);
+  playBeep(196,90,.16);
+  setTimeout(()=>playBeep(294,100,.16),120);
+  setTimeout(()=>playBeep(392,110,.16),250);
+  setTimeout(()=>playBeep(523,150,.17),400);
+}
+
+function powerOn(){
+  if(poweredOn) return;
+
+  poweredOn=true;
+  unlockAudio();
+  showBoot();
 }
 
 function renderDays(){
@@ -462,27 +493,29 @@ function showBoot(){
   stopPet();
   renderDays();
 
-  document.getElementById("screen").classList.add("boot-dark");
+  document.getElementById("screen").className="screen boot-dark";
   document.getElementById("statusBar").innerHTML="POWER";
   document.getElementById("playArea").innerHTML="<div class='boot-text'>BOOTING...</div>";
 
-  setTimeout(()=>playBoot(),250);
+  setTimeout(()=>playBoot(),120);
 
   setTimeout(()=>{
     document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT";
   },650);
 
   setTimeout(()=>{
-    document.getElementById("screen").classList.remove("boot-dark");
+    document.getElementById("screen").className="screen";
     showMain(true);
   },1100);
 }
 
 function showMain(fromBoot=false){
+  if(!poweredOn) return;
+
   stopPet();
   renderDays();
 
-  document.getElementById("screen").classList.remove("boot-dark");
+  document.getElementById("screen").className="screen";
   document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT";
 
   let now = new Date();
@@ -538,6 +571,8 @@ function showMain(fromBoot=false){
 }
 
 function showChecklist(){
+  if(!poweredOn) return;
+
   stopPet();
 
   if(todayIndex<0){
@@ -584,6 +619,8 @@ function toggleRule(index){
 }
 
 function lockInDay(){
+  if(!poweredOn) return;
+
   stopPet();
 
   let checks=state.checks[todayIndex];
@@ -608,6 +645,8 @@ function lockInDay(){
 }
 
 function showWeek(){
+  if(!poweredOn) return;
+
   stopPet();
 
   playMenu();
@@ -630,15 +669,17 @@ function showWeek(){
 }
 
 function resetWeek(){
+  if(!poweredOn) return;
+
   stopPet();
 
-  playBeep(220,180,.13);
+  playBeep(220,180,.15);
   state=freshState();
   saveState();
   showMain();
 }
 
-showBoot();
+renderDays();
 </script>
 
 </body>
