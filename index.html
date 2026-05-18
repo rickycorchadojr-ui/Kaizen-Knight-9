@@ -2,7 +2,6 @@
 <html>
 <head>
   <title>Kaizen Knight</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,324 +16,55 @@
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
   <style>
-    body{
-      margin:0;
-      height:100vh;
-      background:#222;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      font-family:'VT323', monospace;
-      overflow:hidden;
-      -webkit-user-select:none;
-      user-select:none;
-      touch-action:manipulation;
-    }
-
-    .device{
-      width:min(92vw,420px);
-      height:min(86vh,740px);
-      background:#d8d0b0;
-      border:6px solid #111;
-      border-radius:24px;
-      padding:24px;
-      box-sizing:border-box;
-      box-shadow:0 8px 0 #111;
-    }
-
-    .screen{
-      width:100%;
-      height:68%;
-      background:#e9ecd8;
-      border:5px solid #111;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-      box-sizing:border-box;
-    }
-
-    .screen.off,
-    .screen.boot-dark{
-      background:#111;
-    }
-
-    .status-bar{
-      height:38px;
-      border-bottom:4px solid #111;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      font-size:24px;
-      letter-spacing:2px;
-      flex-shrink:0;
-    }
-
-    .off .status-bar,
-    .boot-dark .status-bar{
-      color:#e9ecd8;
-      border-bottom:4px solid #e9ecd8;
-    }
-
-    .play-area{
-      flex:1;
-      min-height:0;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      box-sizing:border-box;
-      overflow:hidden;
-    }
-
-    .power-quote{
-      width:88%;
-      background:#111;
-      color:#e9ecd8;
-      border:4px solid #e9ecd8;
-      font-family:'VT323', monospace;
-      font-size:24px;
-      line-height:1.02;
-      padding:14px 12px;
-      box-shadow:none;
-      text-align:center;
-    }
-
-    .power-author{
-      display:block;
-      margin-top:10px;
-      font-size:22px;
-    }
-
-    .boot-text{
-      color:#e9ecd8;
-      font-size:32px;
-      letter-spacing:2px;
-      animation:bootPulse .8s infinite steps(2);
-    }
-
-    @keyframes bootPulse{
-      0%{opacity:1}
-      50%{opacity:.35}
-      100%{opacity:1}
-    }
-
-    .pet-zone{
-      width:240px;
-      height:130px;
-      position:relative;
-      margin-bottom:-10px;
-    }
-
-    .pet-walker{
-      position:absolute;
-      left:50%;
-      bottom:28px;
-      transform:translateX(-50%);
-    }
-
-    .pet-bob{
-      animation:bob 1.2s infinite steps(2);
-    }
-
-    .pet-img{
-      width:160px;
-      height:160px;
-      display:block;
-      image-rendering:pixelated;
-      image-rendering:crisp-edges;
-      object-fit:contain;
-      opacity:.92;
-      filter:grayscale(1) contrast(2) brightness(.55);
-    }
-
-    .pet-walker.right .pet-img{
-      transform:scaleX(-1);
-    }
-
-    .pet-walker.left .pet-img{
-      transform:scaleX(1);
-    }
-
-    @keyframes bob{
-      0%{transform:translateY(0)}
-      50%{transform:translateY(-4px)}
-      100%{transform:translateY(0)}
-    }
-
-    .ground{
-      width:100px;
-      border-bottom:4px solid #111;
-      margin-bottom:14px;
-    }
-
-    .textbox{
-      width:100%;
-      background:#f8f8f8;
-      border-top:4px solid #111;
-      padding:9px;
-      box-sizing:border-box;
-      text-align:center;
-      font-size:24px;
-      line-height:1.03;
-    }
-
-    .subline{
-      font-size:20px;
-      opacity:.9;
-    }
-
-    .panel{
-      width:100%;
-      height:100%;
-      display:flex;
-      flex-direction:column;
-      background:#f8f8f8;
-    }
-
-    .panel-title{
-      text-align:center;
-      font-size:25px;
-      padding:5px;
-      border-bottom:4px solid #111;
-      flex-shrink:0;
-    }
-
-    .scroll{
-      flex:1;
-      overflow-y:auto;
-      padding:8px 10px;
-      box-sizing:border-box;
-    }
-
-    .section-label{
-      font-size:23px;
-      margin:8px 0 5px;
-      border-bottom:3px solid #111;
-      letter-spacing:1px;
-    }
-
-    .rule{
-      display:flex;
-      align-items:flex-start;
-      gap:8px;
-      margin-bottom:8px;
-      font-size:22px;
-      line-height:1.0;
-    }
-
-    .box{
-      width:15px;
-      height:15px;
-      border:3px solid #111;
-      background:#f8f8f8;
-      flex-shrink:0;
-      cursor:pointer;
-      margin-top:2px;
-    }
-
-    .box.checked{
-      background:#111;
-    }
-
-    .note{
-      font-size:22px;
-      line-height:1.05;
-      margin-bottom:12px;
-      padding-bottom:8px;
-      border-bottom:2px dotted #111;
-    }
-
-    .small-note{
-      font-size:19px;
-      opacity:.85;
-      margin:4px 0 10px;
-      text-align:center;
-    }
-
-    .panel-buttons{
-      border-top:4px solid #111;
-      padding:6px;
-      display:flex;
-      gap:8px;
-      background:#f8f8f8;
-    }
-
-    .mini-btn{
-      flex:1;
-      height:36px;
-      background:#111;
-      color:white;
-      border:none;
-      font-family:'VT323', monospace;
-      font-size:24px;
-    }
-
-    .week-row{
-      margin-top:18px;
-      display:flex;
-      justify-content:space-between;
-      gap:5px;
-    }
-
-    .day{
-      flex:1;
-      height:34px;
-      border:3px solid #111;
-      background:#f8f8f8;
-      font-size:19px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-    }
-
-    .day.complete{
-      background:#111;
-      color:white;
-    }
-
-    .day.failed{
-      text-decoration:line-through;
-    }
-
-    .day.today{
-      outline:3px solid #111;
-    }
-
-    .day.inactive{
-      opacity:.35;
-    }
-
-    .buttons{
-      margin-top:22px;
-      display:flex;
-      gap:8px;
-    }
-
-    button{
-      flex:1;
-      height:48px;
-      background:#111;
-      color:white;
-      border:none;
-      font-family:'VT323', monospace;
-      font-size:24px;
-      box-shadow:0 4px 0 #333;
-    }
-
-    button:active{
-      transform:translateY(3px);
-      box-shadow:0 1px 0 #333;
-    }
+    body{margin:0;height:100vh;background:#222;display:flex;justify-content:center;align-items:center;font-family:'VT323',monospace;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+    .device{width:min(92vw,420px);height:min(86vh,740px);background:#d8d0b0;border:6px solid #111;border-radius:24px;padding:24px;box-sizing:border-box;box-shadow:0 8px 0 #111;}
+    .screen{width:100%;height:68%;background:#e9ecd8;border:5px solid #111;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
+    .screen.off,.screen.boot-dark{background:#111;}
+    .status-bar{height:38px;border-bottom:4px solid #111;display:flex;justify-content:center;align-items:center;font-size:24px;letter-spacing:2px;flex-shrink:0;}
+    .off .status-bar,.boot-dark .status-bar{color:#e9ecd8;border-bottom:4px solid #e9ecd8;}
+    .play-area{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;box-sizing:border-box;overflow:hidden;}
+    .power-quote{width:88%;background:#111;color:#e9ecd8;border:4px solid #e9ecd8;font-family:'VT323',monospace;font-size:24px;line-height:1.02;padding:14px 12px;box-shadow:none;text-align:center;}
+    .power-author{display:block;margin-top:10px;font-size:22px;}
+    .boot-text{color:#e9ecd8;font-size:32px;letter-spacing:2px;animation:bootPulse .8s infinite steps(2);}
+    @keyframes bootPulse{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}
+    .pet-zone{width:240px;height:130px;position:relative;margin-bottom:-10px;}
+    .pet-walker{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);}
+    .pet-bob{animation:bob 1.2s infinite steps(2);}
+    .pet-img{width:160px;height:160px;display:block;image-rendering:pixelated;image-rendering:crisp-edges;object-fit:contain;opacity:.92;filter:grayscale(1) contrast(2) brightness(.55);}
+    .pet-walker.right .pet-img{transform:scaleX(-1);}
+    .pet-walker.left .pet-img{transform:scaleX(1);}
+    @keyframes bob{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+    .ground{width:100px;border-bottom:4px solid #111;margin-bottom:14px;}
+    .textbox{width:100%;background:#f8f8f8;border-top:4px solid #111;padding:9px;box-sizing:border-box;text-align:center;font-size:24px;line-height:1.03;}
+    .subline{font-size:20px;opacity:.9;}
+    .panel{width:100%;height:100%;display:flex;flex-direction:column;background:#f8f8f8;}
+    .panel-title{text-align:center;font-size:25px;padding:5px;border-bottom:4px solid #111;flex-shrink:0;}
+    .scroll{flex:1;overflow-y:auto;padding:8px 10px;box-sizing:border-box;}
+    .section-label{font-size:23px;margin:8px 0 5px;border-bottom:3px solid #111;letter-spacing:1px;}
+    .rule{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:22px;line-height:1.0;}
+    .box{width:15px;height:15px;border:3px solid #111;background:#f8f8f8;flex-shrink:0;cursor:pointer;margin-top:2px;}
+    .box.checked{background:#111;}
+    .note{font-size:22px;line-height:1.05;margin-bottom:12px;padding-bottom:8px;border-bottom:2px dotted #111;}
+    .small-note{font-size:19px;opacity:.85;margin:4px 0 10px;text-align:center;}
+    .panel-buttons{border-top:4px solid #111;padding:6px;display:flex;gap:8px;background:#f8f8f8;}
+    .mini-btn{flex:1;height:36px;background:#111;color:white;border:none;font-family:'VT323',monospace;font-size:24px;}
+    .week-row{margin-top:18px;display:flex;justify-content:space-between;gap:5px;}
+    .day{flex:1;height:34px;border:3px solid #111;background:#f8f8f8;font-size:19px;display:flex;justify-content:center;align-items:center;}
+    .day.complete{background:#111;color:white;}
+    .day.failed{text-decoration:line-through;}
+    .day.today{outline:3px solid #111;}
+    .day.inactive{opacity:.35;}
+    .buttons{margin-top:22px;display:flex;gap:8px;}
+    button{flex:1;height:48px;background:#111;color:white;border:none;font-family:'VT323',monospace;font-size:24px;box-shadow:0 4px 0 #333;}
+    button:active{transform:translateY(3px);box-shadow:0 1px 0 #333;}
   </style>
 </head>
 
 <body>
 
 <div class="device">
-
   <div class="screen off" id="screen">
     <div class="status-bar" id="statusBar">POWER OFF</div>
-
     <div class="play-area" id="playArea">
       <button class="power-quote" onclick="powerOn()">
         “The minute that we change our minds and stop giving power to the past, the past with its mistakes loses its power over us.”
@@ -357,11 +87,9 @@
     <button onclick="showCode()">CODE</button>
     <button onclick="resetWeek()">RESET</button>
   </div>
-
 </div>
 
 <script>
-
 const weekdayVows=[
   "LOCK RISK SETTINGS",
   "RECORD EVERY SESSION",
@@ -419,14 +147,11 @@ function makeToneWav(freq=440,duration=.1,volume=.7){
   const sampleRate=22050;
   const samples=Math.floor(sampleRate*duration);
   const dataSize=samples*2;
-
   const buffer=new ArrayBuffer(44+dataSize);
   const view=new DataView(buffer);
 
   function writeString(offset,string){
-    for(let i=0;i<string.length;i++){
-      view.setUint8(offset+i,string.charCodeAt(i));
-    }
+    for(let i=0;i<string.length;i++) view.setUint8(offset+i,string.charCodeAt(i));
   }
 
   writeString(0,"RIFF");
@@ -453,10 +178,7 @@ function makeToneWav(freq=440,duration=.1,volume=.7){
 
   let binary="";
   const bytes=new Uint8Array(buffer);
-
-  for(let i=0;i<bytes.length;i++){
-    binary+=String.fromCharCode(bytes[i]);
-  }
+  for(let i=0;i<bytes.length;i++) binary+=String.fromCharCode(bytes[i]);
 
   return "data:audio/wav;base64,"+btoa(binary);
 }
@@ -466,12 +188,10 @@ function buildSounds(){
   sounds.menu=new Audio(makeToneWav(500,.08,.7));
   sounds.fail=new Audio(makeToneWav(180,.25,.8));
   sounds.reset=new Audio(makeToneWav(220,.18,.7));
-
   sounds.boot1=new Audio(makeToneWav(196,.09,.8));
   sounds.boot2=new Audio(makeToneWav(294,.1,.8));
   sounds.boot3=new Audio(makeToneWav(392,.1,.85));
   sounds.boot4=new Audio(makeToneWav(523,.15,.9));
-
   sounds.good1=new Audio(makeToneWav(523,.12,.8));
   sounds.good2=new Audio(makeToneWav(659,.12,.8));
   sounds.good3=new Audio(makeToneWav(784,.22,.85));
@@ -485,12 +205,9 @@ function play(name){
 
 function getTradingDayIndex(){
   let d=new Date().getDay();
-
-  if(d===6) return -1; // Saturday rest day
-
-  if(d===0) return 0;  // Sunday
-  if(d>=1 && d<=5) return d; // Monday-Friday
-
+  if(d===6) return -1;
+  if(d===0) return 0;
+  if(d>=1 && d<=5) return d;
   return -1;
 }
 
@@ -514,30 +231,15 @@ function freshState(){
 
 function loadState(){
   let saved=localStorage.getItem("kaizenKnightV5");
-
   if(!saved) return freshState();
 
   try{
     let parsed=JSON.parse(saved);
-
-    if(parsed.weekKey!==weekKey){
-      return freshState();
-    }
-
-    if(!parsed.sundayVows || parsed.sundayVows.length!==sundayVows.length){
-      return freshState();
-    }
-
-    if(!parsed.weekdayVows || parsed.weekdayVows[1].length!==weekdayVows.length){
-      return freshState();
-    }
-
-    if(!parsed.damage || parsed.damage[0].length!==damageStates.length){
-      return freshState();
-    }
-
+    if(parsed.weekKey!==weekKey) return freshState();
+    if(!parsed.sundayVows || parsed.sundayVows.length!==sundayVows.length) return freshState();
+    if(!parsed.weekdayVows || parsed.weekdayVows[1].length!==weekdayVows.length) return freshState();
+    if(!parsed.damage || parsed.damage[0].length!==damageStates.length) return freshState();
     return parsed;
-
   }catch(e){
     return freshState();
   }
@@ -564,10 +266,7 @@ function petHTML(type="knight"){
     <div class="pet-zone">
       <div class="pet-walker left" id="petWalker">
         <div class="pet-bob">
-          <img class="pet-img"
-               id="petImg"
-               src="${getPetImage(type)}"
-               data-pet-type="${type}">
+          <img class="pet-img" id="petImg" src="${getPetImage(type)}" data-pet-type="${type}">
         </div>
       </div>
     </div>
@@ -579,21 +278,17 @@ function stopPet(){
 }
 
 function startPet(delay=0){
-
   stopPet();
 
   setTimeout(()=>{
-
     const walker=document.getElementById("petWalker");
     const pet=document.getElementById("petImg");
-
     if(!walker || !pet) return;
 
     petStep=0;
     walker.style.left=petPositions[petStep]+"%";
 
     moveTimer=setInterval(()=>{
-
       const current=petPositions[petStep];
       petStep=(petStep+1)%petPositions.length;
       const next=petPositions[petStep];
@@ -601,47 +296,27 @@ function startPet(delay=0){
       if(next>current){
         walker.className="pet-walker right";
         pet.src=getPetImage(pet.dataset.petType);
-      }
-      else if(next<current){
+      }else if(next<current){
         walker.className="pet-walker left";
         pet.src=getPetImage(pet.dataset.petType);
-      }
-      else{
-        if(pet.dataset.petType==="knight"){
-          pet.src="blink.png";
-        }
+      }else{
+        if(pet.dataset.petType==="knight") pet.src="blink.png";
       }
 
       walker.style.left=next+"%";
-
     },1200);
-
   },delay);
 }
 
 function renderDays(){
-
   for(let i=0;i<6;i++){
-
     let el=document.getElementById("day"+i);
-
     el.className="day";
 
-    if(state.statuses[i]==="complete"){
-      el.classList.add("complete");
-    }
-
-    if(state.statuses[i]==="failed"){
-      el.classList.add("failed");
-    }
-
-    if(state.statuses[i]==="inactive"){
-      el.classList.add("inactive");
-    }
-
-    if(i===todayIndex){
-      el.classList.add("today");
-    }
+    if(state.statuses[i]==="complete") el.classList.add("complete");
+    if(state.statuses[i]==="failed") el.classList.add("failed");
+    if(state.statuses[i]==="inactive") el.classList.add("inactive");
+    if(i===todayIndex) el.classList.add("today");
   }
 }
 
@@ -658,9 +333,7 @@ function perfectWeek(){
 }
 
 function powerOn(){
-
   if(poweredOn) return;
-
   poweredOn=true;
 
   play("boot1");
@@ -672,19 +345,13 @@ function powerOn(){
 }
 
 function showBoot(){
-
   renderDays();
 
   document.getElementById("screen").className="screen boot-dark";
-
   document.getElementById("statusBar").innerHTML="POWER";
+  document.getElementById("playArea").innerHTML="<div class='boot-text'>BOOTING...</div>";
 
-  document.getElementById("playArea").innerHTML=
-    "<div class='boot-text'>BOOTING...</div>";
-
-  setTimeout(()=>{
-    document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT";
-  },650);
+  setTimeout(()=>{ document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT"; },650);
 
   setTimeout(()=>{
     document.getElementById("screen").className="screen";
@@ -693,25 +360,17 @@ function showBoot(){
 }
 
 function showMain(fromBoot=false){
-
   stopPet();
   renderDays();
 
   document.getElementById("screen").className="screen";
   document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT";
 
-  let date=new Date();
-
-  let dateString=date.toLocaleDateString([],{
-    month:'short',
-    day:'numeric'
-  });
-
+  let weekText="WEEK OF "+weekKey;
   let status="REST DAY";
   let petType="knight";
 
   if(todayIndex>=0){
-
     status="STEADY";
 
     if(state.statuses[todayIndex]==="complete"){
@@ -729,8 +388,8 @@ function showMain(fromBoot=false){
     petHTML(petType)+
     "<div class='ground'></div>"+
     "<div class='textbox'>"+
-    dateString+
-    "<br>"+status+
+    weekText+
+    "<br>STATUS: "+status+
     "<br><span class='subline'>CLEAN DAYS: "+cleanCount()+"/6</span>"+
     "</div>";
 
@@ -738,7 +397,6 @@ function showMain(fromBoot=false){
 }
 
 function showCheck(){
-
   if(todayIndex<0){
     showMain();
     return;
@@ -759,7 +417,6 @@ function showCheck(){
   html+="<div class='small-note'>CHECK WHAT HELD TRUE TODAY</div>";
 
   for(let i=0;i<todaysVows.length;i++){
-
     html+="<div class='rule'>";
     html+="<div class='box "+(vowState[i]?"checked":"")+"' onclick='toggleVow("+i+")'></div>";
     html+="<div>"+todaysVows[i]+"</div>";
@@ -770,7 +427,6 @@ function showCheck(){
   html+="<div class='small-note'>ONLY MARK IF CONTAINMENT BROKE</div>";
 
   for(let i=0;i<damageStates.length;i++){
-
     html+="<div class='rule'>";
     html+="<div class='box "+(state.damage[todayIndex][i]?"checked":"")+"' onclick='toggleDamage("+i+")'></div>";
     html+="<div>"+damageStates[i]+"</div>";
@@ -778,19 +434,16 @@ function showCheck(){
   }
 
   html+="</div>";
-
   html+="<div class='panel-buttons'>";
   html+="<button class='mini-btn' onclick='lockDay()'>LOCK</button>";
   html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
   html+="</div>";
-
   html+="</div>";
 
   document.getElementById("playArea").innerHTML=html;
 }
 
 function showCode(){
-
   play("menu");
   stopPet();
 
@@ -804,77 +457,60 @@ function showCode(){
   }
 
   html+="</div>";
-
   html+="<div class='panel-buttons'>";
   html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
   html+="</div>";
-
   html+="</div>";
 
   document.getElementById("playArea").innerHTML=html;
 }
 
 function toggleVow(i){
-
   let vowState=getVowStateForToday();
-
   vowState[i]=!vowState[i];
 
   saveState();
   play("tick");
-
   showCheck();
 }
 
 function toggleDamage(i){
-
   state.damage[todayIndex][i]=!state.damage[todayIndex][i];
 
   saveState();
   play("tick");
-
   showCheck();
 }
 
 function lockDay(){
-
   stopPet();
 
   let passed=true;
   let vowState=getVowStateForToday();
 
   for(let i=0;i<vowState.length;i++){
-    if(!vowState[i]){
-      passed=false;
-    }
+    if(!vowState[i]) passed=false;
   }
 
   for(let i=0;i<damageStates.length;i++){
-    if(state.damage[todayIndex][i]){
-      passed=false;
-    }
+    if(state.damage[todayIndex][i]) passed=false;
   }
 
   state.statuses[todayIndex]=passed ? "complete" : "failed";
-
   saveState();
 
   if(passed){
     play("good1");
     setTimeout(()=>play("good2"),160);
     setTimeout(()=>play("good3"),320);
-  }
-  else{
+  }else{
     play("fail");
   }
 
   renderDays();
 
   let petType=passed ? "king" : "rook";
-
-  if(passed && perfectWeek()){
-    petType="angel";
-  }
+  if(passed && perfectWeek()) petType="angel";
 
   document.getElementById("playArea").innerHTML=
     petHTML(petType)+
@@ -888,19 +524,14 @@ function lockDay(){
 }
 
 function resetWeek(){
-
   play("reset");
-
   state=freshState();
-
   saveState();
-
   showMain();
 }
 
 buildSounds();
 renderDays();
-
 </script>
 
 </body>
