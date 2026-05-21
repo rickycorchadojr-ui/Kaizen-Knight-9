@@ -441,6 +441,24 @@ function getPetImage(type){
   return "knight.png";
 }
 
+function getPetBlinkImage(type){
+  if(type==="knight") return "blink.png";
+  if(type==="angel") return "angelblink.png";
+  if(type==="red") return "redblink.png";
+  if(type==="orange") return "orangeblink.png";
+  if(type==="yellow") return "yellowblink.png";
+  if(type==="green") return "greenblink.png";
+  if(type==="blue") return "blueblink.png";
+  if(type==="purple") return "purpleblink.png";
+  if(type==="black") return "blackblink.png";
+  if(type==="brown") return "brownblink.png";
+  return null;
+}
+
+function canPetBlink(type){
+  return getPetBlinkImage(type)!==null;
+}
+
 function isCleanSprite(type){
   return type==="angel" || type==="red" || type==="orange" || type==="yellow" || type==="green" || type==="blue" || type==="purple" || type==="black" || type==="brown";
 }
@@ -529,15 +547,18 @@ function startPet(delay=0){
       const current=petPositions[petStep];
       petStep=(petStep+1)%petPositions.length;
       const next=petPositions[petStep];
+      const petType=pet.dataset.petType;
 
       if(next>current){
         walker.className="pet-walker right";
-        pet.src=getPetImage(pet.dataset.petType);
+        pet.src=getPetImage(petType);
       }else if(next<current){
         walker.className="pet-walker left";
-        pet.src=getPetImage(pet.dataset.petType);
+        pet.src=getPetImage(petType);
       }else{
-        if(pet.dataset.petType==="knight") pet.src="blink.png";
+        if(canPetBlink(petType)){
+          pet.src=getPetBlinkImage(petType);
+        }
       }
 
       walker.style.left=next+"%";
