@@ -21,46 +21,14 @@
     .off .status-bar,.boot-dark .status-bar{color:#e9ecd8;border-bottom:4px solid #e9ecd8;}
     .play-area{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;box-sizing:border-box;overflow:hidden;position:relative;}
 
-    .scene-bg{
-      position:absolute;
-      left:50%;
-      bottom:88px;
-      width:320px;
-      height:auto;
-      transform:translateX(-50%);
-      object-fit:contain;
-      image-rendering:pixelated;
-      image-rendering:crisp-edges;
-      z-index:1;
-      pointer-events:none;
-    }
-
-    .ufo{
-      position:absolute;
-      top:52px;
-      left:0;
-      width:64px;
-      height:auto;
-      image-rendering:pixelated;
-      image-rendering:crisp-edges;
-      pointer-events:none;
-      z-index:2;
-      animation:ufoFly 60s linear infinite;
-    }
-
-    @keyframes ufoFly{
-      0%{transform:translateX(-90px);}
-      100%{transform:translateX(410px);}
-    }
+    .scene-bg{position:absolute;left:50%;bottom:88px;width:320px;height:auto;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;z-index:1;pointer-events:none;}
+    .ufo{position:absolute;top:52px;left:0;width:64px;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none;z-index:2;animation:ufoFly 60s linear infinite;}
+    @keyframes ufoFly{0%{transform:translateX(-90px);}100%{transform:translateX(410px);}}
 
     .achievement-banner{position:absolute;top:0;left:50%;transform:translate(-50%,-120%);background:#111;color:#f8f8f8;border:4px solid #f8f8f8;font-size:30px;line-height:1;padding:7px 18px;z-index:20;white-space:nowrap;letter-spacing:2px;pointer-events:none;}
     .achievement-banner.show{animation:achievementDrop 2.05s forwards;}
-    @keyframes achievementDrop{
-      0%{transform:translate(-50%,-120%);}
-      18%{transform:translate(-50%,8px);}
-      72%{transform:translate(-50%,8px);}
-      100%{transform:translate(-50%,-120%);}
-    }
+    @keyframes achievementDrop{0%{transform:translate(-50%,-120%);}18%{transform:translate(-50%,8px);}72%{transform:translate(-50%,8px);}100%{transform:translate(-50%,-120%);}}
+
     .streak-counter{position:absolute;top:8px;right:10px;font-size:32px;line-height:.8;color:#111;text-align:right;min-width:0;font-family:'VT323',monospace;letter-spacing:1px;z-index:5;}
     .power-quote{width:88%;background:#111;color:#e9ecd8;border:4px solid #e9ecd8;font-family:'VT323',monospace;font-size:24px;line-height:1.02;padding:14px 12px;box-shadow:none;text-align:center;}
     .power-author{display:block;margin-top:10px;font-size:22px;}
@@ -76,9 +44,11 @@
     .pet-walker.right .pet-img{transform:scaleX(-1);}
     .pet-walker.left .pet-img{transform:scaleX(1);}
     @keyframes bob{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+
     .ground{width:100px;border-bottom:4px solid #111;margin-bottom:14px;position:relative;z-index:2;}
     .textbox{width:100%;background:#f8f8f8;border-top:4px solid #111;padding:9px;box-sizing:border-box;text-align:center;font-size:24px;line-height:1.03;position:relative;z-index:3;}
     .subline{font-size:20px;opacity:.9;}
+
     .panel{width:100%;height:100%;display:flex;flex-direction:column;background:#f8f8f8;}
     .panel-title{text-align:center;font-size:25px;padding:5px;border-bottom:4px solid #111;flex-shrink:0;}
     .scroll{flex:1;overflow-y:auto;padding:8px 10px;box-sizing:border-box;}
@@ -88,14 +58,29 @@
     .box.checked{background:#111;}
     .note{font-size:22px;line-height:1.05;margin-bottom:12px;padding-bottom:8px;border-bottom:2px dotted #111;}
     .small-note{font-size:19px;opacity:.85;margin:4px 0 10px;text-align:center;}
+
+    .gallery-wrap{width:100%;height:100%;display:flex;flex-direction:column;background:#f8f8f8;}
+    .gallery-title{text-align:center;font-size:25px;padding:5px;border-bottom:4px solid #111;flex-shrink:0;}
+    .gallery-hall{flex:1;overflow-x:auto;overflow-y:hidden;white-space:nowrap;background:#e9ecd8;padding:18px 14px;box-sizing:border-box;}
+    .trophy-card{display:inline-flex;vertical-align:top;width:116px;height:188px;margin-right:12px;background:#f8f8f8;border:4px solid #111;box-sizing:border-box;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:10px 5px;}
+    .trophy-card.locked{opacity:.35;background:#e9ecd8;}
+    .trophy-icon{font-size:48px;line-height:1;}
+    .trophy-day{font-size:27px;line-height:.9;}
+    .trophy-date{font-size:19px;line-height:.9;min-height:34px;display:flex;align-items:center;justify-content:center;}
+    .pedestal{width:62px;height:22px;border:4px solid #111;border-top:none;margin-top:2px;}
+    .empty-trophy{font-size:48px;line-height:1;opacity:.55;}
+    .gallery-footer{font-size:19px;text-align:center;border-top:4px solid #111;padding:4px;background:#f8f8f8;}
+
     .panel-buttons{border-top:4px solid #111;padding:6px;display:flex;gap:8px;background:#f8f8f8;}
     .mini-btn{flex:1;height:36px;background:#111;color:white;border:none;font-family:'VT323',monospace;font-size:24px;}
+
     .week-row{margin-top:18px;display:flex;justify-content:space-between;gap:5px;}
     .day{flex:1;height:34px;border:3px solid #111;background:#f8f8f8;font-size:19px;display:flex;justify-content:center;align-items:center;}
     .day.complete{background:#111;color:white;}
     .day.failed{text-decoration:line-through;}
     .day.today{outline:3px solid #111;}
     .day.inactive{opacity:.35;}
+
     .buttons{margin-top:22px;display:flex;gap:8px;}
     button{flex:1;height:48px;background:#111;color:white;border:none;font-family:'VT323',monospace;font-size:24px;box-shadow:0 4px 0 #333;}
     button:active{transform:translateY(3px);box-shadow:0 1px 0 #333;}
@@ -112,6 +97,7 @@
       </button>
     </div>
   </div>
+
   <div class="week-row">
     <div class="day" id="day0">SUN</div>
     <div class="day" id="day1">MON</div>
@@ -120,10 +106,11 @@
     <div class="day" id="day4">THU</div>
     <div class="day" id="day5">FRI</div>
   </div>
+
   <div class="buttons">
     <button onclick="showCheckWithMenuSound()">CHECK</button>
     <button onclick="showCode()">CODE</button>
-    <button onclick="resetWeek()">RESET</button>
+    <button onclick="showGallery()">GALLERY</button>
   </div>
 </div>
 
@@ -138,16 +125,19 @@ const weekdayVows=[
   "IF STOP HIT, NO TRADING SECOND ACCOUNT",
   "DRILLS"
 ];
+
 const sundayVows=[
   "LOCK BOTH ACCOUNTS",
   "DRILLS"
 ];
+
 const damageStates=[
   "SPIRALED AFTER LOSS",
   "TRADED OUTSIDE ROUTINE",
   "RISK SETTINGS REMOVED",
   "BOUGHT / RESET COMBINE"
 ];
+
 const codeNotes=[
   "CONSIDER STOPPING AT -250.",
   "LOOK FOR CHOP AND MANIPULATION.",
@@ -203,18 +193,66 @@ function ufoHTML(){
   return "";
 }
 
+function getAchievementDays(){
+  let arr=[];
+  for(let i=1;i<=100;i++) arr.push(i);
+  for(let i=105;i<=365;i+=5) arr.push(i);
+  return arr;
+}
+
+function isAchievementDay(day){
+  if(day>=1 && day<=100) return true;
+  if(day>100 && day<=365 && day%5===0) return true;
+  return false;
+}
+
+function formatToday(){
+  const now=new Date();
+  const months=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  return months[now.getMonth()]+" "+now.getDate()+" "+now.getFullYear();
+}
+
+function ensureAchievementArchive(){
+  if(!state.achievements) state.achievements={};
+
+  let changed=false;
+  const days=getAchievementDays();
+
+  for(let i=0;i<days.length;i++){
+    let d=days[i];
+    if(d<=state.bestStreak && !state.achievements[d]){
+      state.achievements[d]="PAST RECORD";
+      changed=true;
+    }
+  }
+
+  if(changed) saveState();
+}
+
+function recordAchievement(day){
+  if(!isAchievementDay(day)) return;
+  if(!state.achievements) state.achievements={};
+  if(!state.achievements[day]){
+    state.achievements[day]=formatToday();
+  }
+}
+
 function makeToneSequenceWav(sequence){
   const sampleRate=22050;
   let totalSamples=0;
+
   for(let i=0;i<sequence.length;i++){
     totalSamples+=Math.floor(sampleRate*sequence[i].duration);
   }
+
   const dataSize=totalSamples*2;
   const buffer=new ArrayBuffer(44+dataSize);
   const view=new DataView(buffer);
+
   function writeString(offset,string){
     for(let i=0;i<string.length;i++) view.setUint8(offset+i,string.charCodeAt(i));
   }
+
   writeString(0,"RIFF");
   view.setUint32(4,36+dataSize,true);
   writeString(8,"WAVE");
@@ -228,24 +266,30 @@ function makeToneSequenceWav(sequence){
   view.setUint16(34,16,true);
   writeString(36,"data");
   view.setUint32(40,dataSize,true);
+
   let sampleIndex=0;
+
   for(let s=0;s<sequence.length;s++){
     const freq=sequence[s].freq;
     const duration=sequence[s].duration;
     const volume=sequence[s].volume || .7;
     const samples=Math.floor(sampleRate*duration);
+
     for(let i=0;i<samples;i++){
       let sample=0;
+
       if(freq>0){
         const t=i/sampleRate;
         const square=Math.sin(2*Math.PI*freq*t)>=0?1:-1;
         const fade=1-(i/samples);
         sample=square*volume*fade*32767;
       }
+
       view.setInt16(44+sampleIndex*2,sample,true);
       sampleIndex++;
     }
   }
+
   let binary="";
   const bytes=new Uint8Array(buffer);
   for(let i=0;i<bytes.length;i++) binary+=String.fromCharCode(bytes[i]);
@@ -311,6 +355,7 @@ function freshState(){
     streak:0,
     bestStreak:0,
     finalForm:null,
+    achievements:{},
     statuses:["inactive","inactive","inactive","inactive","inactive","inactive"],
     sundayVows:Array(sundayVows.length).fill(false),
     weekdayVows:Array.from({length:6},()=>Array(weekdayVows.length).fill(false)),
@@ -321,20 +366,27 @@ function freshState(){
 function loadState(){
   let saved=localStorage.getItem("kaizenKnightV5");
   if(!saved) return freshState();
+
   try{
     let parsed=JSON.parse(saved);
+
     if(parsed.weekKey!==weekKey){
       let newState=freshState();
       newState.streak=typeof parsed.streak==="number" ? parsed.streak : 0;
       newState.bestStreak=typeof parsed.bestStreak==="number" ? parsed.bestStreak : newState.streak;
+      newState.achievements=parsed.achievements || {};
       return newState;
     }
+
     if(!parsed.sundayVows || parsed.sundayVows.length!==sundayVows.length) return freshState();
     if(!parsed.weekdayVows || parsed.weekdayVows[1].length!==weekdayVows.length) return freshState();
     if(!parsed.damage || parsed.damage[0].length!==damageStates.length) return freshState();
+
     if(typeof parsed.streak!=="number") parsed.streak=cleanCountFromStatuses(parsed.statuses);
     if(typeof parsed.bestStreak!=="number") parsed.bestStreak=parsed.streak;
     if(typeof parsed.finalForm==="undefined") parsed.finalForm=null;
+    if(!parsed.achievements) parsed.achievements={};
+
     return parsed;
   }catch(e){
     return freshState();
@@ -425,19 +477,24 @@ function startFirework(){
   stopFirework();
   const fw=document.getElementById("fireworkImg");
   if(!fw) return;
+
   fireworkFrame=1;
   fw.src="Firework1.png";
   fw.style.display="block";
   play("firework");
+
   fireworkTimer=setInterval(()=>{
     fireworkFrame++;
+
     if(fireworkFrame>12){
       stopFirework();
       return;
     }
+
     if(fireworkFrame===5 || fireworkFrame===9){
       play("firework");
     }
+
     fw.src="Firework"+fireworkFrame+".png";
   },500);
 }
@@ -446,11 +503,14 @@ function showAchievementBanner(dayNum){
   clearTimeout(achievementTimer);
   const banner=document.getElementById("achievementBanner");
   if(!banner) return;
+
   banner.className="achievement-banner";
   banner.innerHTML="DAY "+dayNum+"!";
   void banner.offsetWidth;
+
   playAchievementSound();
   banner.classList.add("show");
+
   achievementTimer=setTimeout(()=>{
     banner.className="achievement-banner";
     banner.innerHTML="";
@@ -459,16 +519,20 @@ function showAchievementBanner(dayNum){
 
 function startPet(delay=0){
   stopPet();
+
   setTimeout(()=>{
     const walker=document.getElementById("petWalker");
     const pet=document.getElementById("petImg");
     if(!walker || !pet) return;
+
     petStep=0;
     walker.style.left=petPositions[petStep]+"%";
+
     moveTimer=setInterval(()=>{
       const current=petPositions[petStep];
       petStep=(petStep+1)%petPositions.length;
       const next=petPositions[petStep];
+
       if(next>current){
         walker.className="pet-walker right";
         pet.src=getPetImage(pet.dataset.petType);
@@ -478,6 +542,7 @@ function startPet(delay=0){
       }else{
         if(pet.dataset.petType==="knight") pet.src="blink.png";
       }
+
       walker.style.left=next+"%";
     },1200);
   },delay);
@@ -487,6 +552,7 @@ function renderDays(){
   for(let i=0;i<6;i++){
     let el=document.getElementById("day"+i);
     el.className="day";
+
     if(state.statuses[i]==="complete") el.classList.add("complete");
     if(state.statuses[i]==="failed") el.classList.add("failed");
     if(state.statuses[i]==="inactive") el.classList.add("inactive");
@@ -501,16 +567,19 @@ function perfectWeek(){ return cleanCount()===6 && failedCount()===0; }
 function weeklyVowPercent(){
   let checked=0;
   let total=0;
+
   for(let i=0;i<sundayVows.length;i++){
     total++;
     if(state.sundayVows[i]) checked++;
   }
+
   for(let d=1;d<=5;d++){
     for(let i=0;i<weekdayVows.length;i++){
       total++;
       if(state.weekdayVows[d][i]) checked++;
     }
   }
+
   if(total<=0) return 0;
   return Math.floor((checked/total)*100);
 }
@@ -540,10 +609,13 @@ function powerOn(){
 
 function showBoot(){
   renderDays();
+
   document.getElementById("screen").className="screen boot-dark";
   document.getElementById("statusBar").innerHTML="POWER";
   document.getElementById("playArea").innerHTML="<div class='boot-text'>BOOTING...</div>";
+
   setTimeout(()=>{ document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT"; },650);
+
   setTimeout(()=>{
     document.getElementById("screen").className="screen";
     showMain(true);
@@ -552,28 +624,36 @@ function showBoot(){
 
 function showMain(fromBoot=false){
   if(!requirePower()) return;
+
   stopPet();
   stopFirework();
   renderDays();
+  ensureAchievementArchive();
+
   document.getElementById("screen").className="screen";
   document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT";
+
   let weekText="WEEK OF "+weekKey;
   let status="REST DAY";
   let petType="knight";
+
   if(shouldShowFinalForm()){
     petType=state.finalForm;
     status=state.finalForm==="angel" ? "PERFECT WEEK" : "WEEK FORM";
   }else if(todayIndex>=0){
     status="STEADY";
+
     if(state.statuses[todayIndex]==="complete"){
       status="DAY SEALED CLEAN";
       petType="king";
     }
+
     if(state.statuses[todayIndex]==="failed"){
       status="INTEGRITY DAMAGED";
       petType="rook";
     }
   }
+
   document.getElementById("playArea").innerHTML=
     achievementHTML()+
     streakHTML()+
@@ -586,46 +666,58 @@ function showMain(fromBoot=false){
     "<br>STATUS: "+status+
     "<br><span class='subline'>CLEAN DAYS: "+cleanCount()+"/6</span>"+
     "</div>";
+
   startPet(fromBoot ? 650 : 0);
 }
 
 function showCheck(restoreScroll=null){
   if(!requirePower()) return;
+
   if(todayIndex<0){
     showMain();
     return;
   }
+
   stopPet();
   stopFirework();
+
   let todaysVows=getTodaysVows();
   let vowState=getVowStateForToday();
+
   let html="";
   html+="<div class='panel'>";
   html+="<div class='panel-title'>"+days[todayIndex]+" CHECK</div>";
   html+="<div class='scroll' id='checkScroll'>";
+
   html+="<div class='section-label'>VOWS</div>";
   html+="<div class='small-note'>CHECK WHAT HELD TRUE TODAY</div>";
+
   for(let i=0;i<todaysVows.length;i++){
     html+="<div class='rule'>";
     html+="<div class='box "+(vowState[i]?"checked":"")+"' onclick='toggleVow("+i+")'></div>";
     html+="<div>"+todaysVows[i]+"</div>";
     html+="</div>";
   }
+
   html+="<div class='section-label'>DAMAGE</div>";
   html+="<div class='small-note'>ONLY MARK IF CONTAINMENT BROKE</div>";
+
   for(let i=0;i<damageStates.length;i++){
     html+="<div class='rule'>";
     html+="<div class='box "+(state.damage[todayIndex][i]?"checked":"")+"' onclick='toggleDamage("+i+")'></div>";
     html+="<div>"+damageStates[i]+"</div>";
     html+="</div>";
   }
+
   html+="</div>";
   html+="<div class='panel-buttons'>";
   html+="<button class='mini-btn' onclick='lockDay()'>LOCK</button>";
   html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
   html+="</div>";
   html+="</div>";
+
   document.getElementById("playArea").innerHTML=html;
+
   if(restoreScroll!==null){
     const sc=document.getElementById("checkScroll");
     if(sc) sc.scrollTop=restoreScroll;
@@ -640,22 +732,79 @@ function showCheckWithMenuSound(){
 
 function showCode(){
   if(!requirePower()) return;
+
   play("menu");
   stopPet();
   stopFirework();
+
   let html="";
   html+="<div class='panel'>";
   html+="<div class='panel-title'>FIELD CODE</div>";
   html+="<div class='scroll'>";
+
   for(let i=0;i<codeNotes.length;i++){
     html+="<div class='note'>"+codeNotes[i]+"</div>";
   }
+
   html+="</div>";
   html+="<div class='panel-buttons'>";
   html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
   html+="</div>";
   html+="</div>";
+
   document.getElementById("playArea").innerHTML=html;
+}
+
+function showGallery(){
+  if(!requirePower()) return;
+
+  play("menu");
+  stopPet();
+  stopFirework();
+  ensureAchievementArchive();
+
+  const achievementDays=getAchievementDays();
+
+  let html="";
+  html+="<div class='gallery-wrap'>";
+  html+="<div class='gallery-title'>TROPHY GALLERY</div>";
+  html+="<div class='gallery-hall' id='galleryHall'>";
+
+  for(let i=0;i<achievementDays.length;i++){
+    let day=achievementDays[i];
+    let earned=state.achievements && state.achievements[day];
+
+    html+="<div class='trophy-card "+(earned?"":"locked")+"'>";
+
+    if(earned){
+      html+="<div class='trophy-icon'>🏆</div>";
+    }else{
+      html+="<div class='empty-trophy'>□</div>";
+    }
+
+    html+="<div class='pedestal'></div>";
+    html+="<div class='trophy-day'>DAY "+day+"</div>";
+    html+="<div class='trophy-date'>"+(earned ? earned : "")+"</div>";
+    html+="</div>";
+  }
+
+  html+="</div>";
+  html+="<div class='gallery-footer'>BEST STREAK: "+state.bestStreak+"</div>";
+  html+="<div class='panel-buttons'>";
+  html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
+  html+="</div>";
+  html+="</div>";
+
+  document.getElementById("playArea").innerHTML=html;
+
+  const hall=document.getElementById("galleryHall");
+  if(hall){
+    let earnedCount=0;
+    for(let i=0;i<achievementDays.length;i++){
+      if(state.achievements && state.achievements[achievementDays[i]]) earnedCount++;
+    }
+    hall.scrollLeft=Math.max(0,(earnedCount-2)*128);
+  }
 }
 
 function getCheckScrollTop(){
@@ -665,9 +814,12 @@ function getCheckScrollTop(){
 
 function toggleVow(i){
   if(!requirePower()) return;
+
   let scrollTop=getCheckScrollTop();
   let vowState=getVowStateForToday();
+
   vowState[i]=!vowState[i];
+
   saveState();
   play("tick");
   showCheck(scrollTop);
@@ -675,8 +827,11 @@ function toggleVow(i){
 
 function toggleDamage(i){
   if(!requirePower()) return;
+
   let scrollTop=getCheckScrollTop();
+
   state.damage[todayIndex][i]=!state.damage[todayIndex][i];
+
   saveState();
   play("tick");
   showCheck(scrollTop);
@@ -684,38 +839,57 @@ function toggleDamage(i){
 
 function lockDay(){
   if(!requirePower()) return;
+
   stopPet();
   stopFirework();
+
   let passed=true;
   let vowState=getVowStateForToday();
+
   for(let i=0;i<vowState.length;i++){
     if(!vowState[i]) passed=false;
   }
+
   for(let i=0;i<damageStates.length;i++){
     if(state.damage[todayIndex][i]) passed=false;
   }
+
   state.statuses[todayIndex]=passed ? "complete" : "failed";
+
   let newRecord=false;
+  let newAchievement=false;
+
   if(passed){
     state.streak++;
+
     if(state.streak>state.bestStreak && state.streak<=365){
       state.bestStreak=state.streak;
       newRecord=true;
+
+      if(isAchievementDay(state.streak)){
+        recordAchievement(state.streak);
+        newAchievement=true;
+      }
     }
   }else{
     state.streak=0;
   }
+
   let shouldPlayFirework=passed && todayIndex===5 && perfectWeek();
   let weeklyForm=null;
+
   if(todayIndex===5){
     if(shouldPlayFirework){
       weeklyForm="angel";
     }else{
       weeklyForm=formFromWeeklyPercent(weeklyVowPercent());
     }
+
     state.finalForm=weeklyForm;
   }
+
   saveState();
+
   if(shouldPlayFirework){
     play("perfectWeek");
   }else if(todayIndex===5 && weeklyForm){
@@ -725,13 +899,18 @@ function lockDay(){
   }else{
     play("fail");
   }
+
   renderDays();
+
   let petType=passed ? "king" : "rook";
+
   if(todayIndex===5 && weeklyForm){
     petType=weeklyForm;
   }
+
   let sealText="DAY SEALED";
   let resultText=passed ? "INTEGRITY PRESERVED" : "INTEGRITY DAMAGED";
+
   if(shouldPlayFirework){
     sealText="PERFECT WEEK!";
     resultText="INTEGRITY PRESERVED";
@@ -739,6 +918,7 @@ function lockDay(){
     sealText="WEEK FORM";
     resultText=weeklyVowPercent()+"% VOWS KEPT";
   }
+
   document.getElementById("playArea").innerHTML=
     achievementHTML()+
     streakHTML()+
@@ -750,29 +930,20 @@ function lockDay(){
     sealText+
     "<br>"+resultText+
     "</div>";
+
   startPet();
+
   if(shouldPlayFirework){
     setTimeout(()=>startFirework(),450);
   }
-  if(newRecord){
+
+  if(newRecord && newAchievement){
     setTimeout(()=>showAchievementBanner(state.streak),650);
   }
 }
 
-function resetWeek(){
-  if(!requirePower()) return;
-  play("reset");
-  stopFirework();
-  let savedStreak=state.streak;
-  let savedBestStreak=state.bestStreak;
-  state=freshState();
-  state.streak=savedStreak;
-  state.bestStreak=savedBestStreak;
-  saveState();
-  showMain();
-}
-
 buildSounds();
+ensureAchievementArchive();
 renderDays();
 </script>
 </body>
