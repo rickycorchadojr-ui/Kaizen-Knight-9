@@ -42,9 +42,10 @@
     .pet-img.clean-img{filter:none;opacity:1;}
     .firework-img{width:160px;height:160px;position:absolute;left:0;top:0;display:none;image-rendering:pixelated;image-rendering:crisp-edges;object-fit:contain;pointer-events:none;z-index:3;}
     .sleep-overlay{width:160px;height:160px;position:absolute;left:0;top:0;display:none;image-rendering:pixelated;image-rendering:crisp-edges;object-fit:contain;pointer-events:none;z-index:4;}
-    .pet-walker.right .pet-img{transform:scaleX(-1);}
-    .pet-walker.left .pet-img{transform:scaleX(1);}
-    @keyframes bob{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+.pet-walker.right .pet-img{transform:scaleX(-1);}
+.pet-walker.left .pet-img{transform:scaleX(1);}
+.pet-walker.right .santa-hat{transform:scaleX(-1);}
+.pet-walker.left .santa-hat{transform:scaleX(1);}    @keyframes bob{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
     .ground{width:100px;border-bottom:4px solid #111;margin-bottom:14px;position:relative;z-index:2;}
     .textbox{width:100%;background:#f8f8f8;border-top:4px solid #111;padding:9px;box-sizing:border-box;text-align:center;font-size:24px;line-height:1.03;position:relative;z-index:3;}
     .subline{font-size:20px;opacity:.9;}
@@ -454,11 +455,22 @@ function isCleanSprite(type){
 function getPetClass(type){ return isCleanSprite(type) ? "pet-img clean-img" : "pet-img"; }
 function streakHTML(){ return "<div class='streak-counter'>"+state.streak+"</div>"; }
 function achievementHTML(){ return "<div class='achievement-banner' id='achievementBanner'></div>"; }
-function santaHatHTML(){
+function santaHatHTML(type){
   const month=new Date().getMonth();
   const isDecember=month===11;
 
-  if(isDecember || FORCE_CHRISTMAS_TEST){
+  const canWearHat =
+    type==="knight" ||
+    type==="red" ||
+    type==="orange" ||
+    type==="yellow" ||
+    type==="green" ||
+    type==="blue" ||
+    type==="purple" ||
+    type==="black" ||
+    type==="brown";
+
+  if((isDecember || FORCE_CHRISTMAS_TEST) && canWearHat){
     return "<img class='santa-hat' src='Santahat.png'>";
   }
 
@@ -475,7 +487,7 @@ function petHTML(type="knight"){
       <div class="pet-walker left" id="petWalker">
         <div class="pet-bob">
           <img class="${getPetClass(type)}" id="petImg" src="${img}" data-pet-type="${type}">
-          ${santaHatHTML()}
+         ${santaHatHTML(type)}
           <img class="sleep-overlay" id="sleepOverlay" src="sleep1.png">
           <img class="firework-img" id="fireworkImg" src="Firework1.png">
         </div>
