@@ -12,11 +12,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:'Radeil';
+  src:url('RadeilRounded-Regular.otf') format('opentype');
+}
+</style>
   <style>
-body{margin:0;height:100vh;background:#2253A0;display:flex;justify-content:center;align-items:center;font-family:'VT323',monospace;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
-.device{width:min(92vw,420px);height:min(86vh,740px);background:#ECECEC;border:6px solid #111;border-radius:32px;padding:18px 24px 24px;box-sizing:border-box;box-shadow:0 8px 0 #111;}
-.device-title{text-align:center;color:#D93831;font-family:'VT323',monospace;font-size:38px;line-height:1;margin:4px 0 12px;letter-spacing:2px;text-transform:lowercase;}
-.screen{width:100%;height:62%;background:#e9ecd8;border:10px solid #346245;border-radius:18px;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
+body{margin:0;height:100vh;background:#111;display:flex;justify-content:center;align-items:center;font-family:'VT323',monospace;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+.device{width:min(92vw,420px);height:min(86vh,740px);background:#ECECEC;border:6px solid #777;border-radius:32px;padding:18px 24px 24px;box-sizing:border-box;box-shadow:0 8px 0 #555;}
+.device-title{text-align:center;color:#D93831;font-family:'Radeil',sans-serif;font-size:34px;line-height:1;margin:4px 0 12px;letter-spacing:1px;}.screen{width:100%;height:62%;background:#e9ecd8;border:10px solid #346245;border-radius:18px;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
 .screen.off,.screen.boot-dark{background:#111;}
 .status-bar{height:38px;border-bottom:4px solid #111;display:flex;justify-content:center;align-items:center;font-size:24px;letter-spacing:2px;flex-shrink:0;}
 .off .status-bar,.boot-dark .status-bar{color:#e9ecd8;border-bottom:4px solid #e9ecd8;}
@@ -87,10 +92,10 @@ body{margin:0;height:100vh;background:#2253A0;display:flex;justify-content:cente
 .day.inactive{opacity:.55;}
 .buttons{margin-top:18px;display:flex;justify-content:space-around;gap:18px;}
 .control-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.control-wrap:nth-child(2){transform:translateY(12px);}
 .control-wrap button{width:64px;height:64px;border-radius:50%;background:#F7CD47;color:transparent;border:none;font-family:'VT323',monospace;font-size:0;box-shadow:0 9px 0 #C99A22;}
 .control-wrap button:active{transform:translateY(5px);box-shadow:0 4px 0 #C99A22;}
-.control-label{font-family:'VT323',monospace;color:#D93831;font-size:24px;line-height:1;text-transform:capitalize;font-weight:bold;}
-  </style>
+.control-label{font-family:'Radeil',sans-serif;color:#7a7a7a;font-size:17px;line-height:1;text-transform:uppercase;letter-spacing:1.5px;}  </style>
 </head>
 <body>
 <div class="device">
@@ -734,7 +739,7 @@ function showBoot(){
   document.getElementById("screen").className="screen boot-dark";
   document.getElementById("statusBar").innerHTML="POWER";
   document.getElementById("playArea").innerHTML="<div class='boot-text'>BOOTING...</div>";
-  setTimeout(()=>{ document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT"; },650);
+  setTimeout(()=>{ document.getElementById("statusBar").innerHTML=""; },650);
   setTimeout(()=>{
     document.getElementById("screen").className="screen";
     showMain(true);
@@ -747,7 +752,7 @@ function showMain(fromBoot=false){
   renderDays();
   ensureAchievementArchive();
   document.getElementById("screen").className="screen";
-  document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT";
+document.getElementById("statusBar").innerHTML="";
   let weekText="WEEK OF "+weekKey;
   let status="REST DAY";
   let petType="knight";
