@@ -40,6 +40,7 @@ body{margin:0;height:100vh;background:#111;display:flex;justify-content:center;a
 .scene-bg{position:absolute;left:50%;bottom:88px;width:320px;height:auto;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;z-index:1;pointer-events:none;}
 .halloween-overlay{position:absolute;left:50%;bottom:88px;width:320px;height:auto;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;z-index:1;pointer-events:none;}
 .rainbow-overlay{position:absolute;left:50%;top:0px;width:320px;height:auto;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;z-index:2;pointer-events:none;}
+.crack-overlay{position:absolute;left:50%;top:0px;width:320px;height:auto;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;z-index:2;pointer-events:none;}
 .ufo{position:absolute;top:52px;left:0;width:64px;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none;z-index:2;animation:ufoFly 60s linear infinite;}
 @keyframes ufoFly{0%{transform:translateX(-90px);}100%{transform:translateX(410px);}}
 .achievement-banner{position:absolute;top:0;left:50%;transform:translate(-50%,-120%);background:#111;color:#f8f8f8;border:4px solid #f8f8f8;font-size:30px;line-height:1;padding:7px 18px;z-index:20;white-space:nowrap;letter-spacing:2px;pointer-events:none;}
@@ -306,7 +307,9 @@ function rainbowHTML(){
   if(FORCE_RAINBOW_TEST) return "<img class='rainbow-overlay' src='Rainbow.png'>";
   return state.rainbowToday ? "<img class='rainbow-overlay' src='Rainbow.png'>" : "";
 }
-
+function crackHTML(){
+  return state.crackActive ? "<img class='crack-overlay' src='Crack.png'>" : "";
+}
 function ufoHTML(){ return state.streak>=35 ? "<img class='ufo' src='ufo.png'>" : ""; }
 function getAchievementDays(){
   let arr=[];
@@ -527,6 +530,7 @@ streak:0,
 bestStreak:0,
 rainbowDayKey:null,
 rainbowToday:false,
+crackActive:false,
 finalForm:null,
     achievements:{},
  records:[],
@@ -559,6 +563,7 @@ return newState;
 if(typeof parsed.finalForm==="undefined") parsed.finalForm=null;
 if(typeof parsed.rainbowDayKey==="undefined") parsed.rainbowDayKey=null;
 if(typeof parsed.rainbowToday==="undefined") parsed.rainbowToday=false;
+if(typeof parsed.crackActive==="undefined") parsed.crackActive=false;
 if(!parsed.achievements) parsed.achievements={};
    if(!parsed.records) parsed.records=[];
 if(!parsed.vault) parsed.vault=createFreshVault();
@@ -910,6 +915,8 @@ seasonalOverlayHTML()+
 
 rainbowHTML()+
 
+crackHTML()+
+
 ufoHTML()+
 petHTML(petType)+
     "<div class='ground'></div>"+
@@ -1150,7 +1157,8 @@ function toggleDamage(i){
   let wasChecked=state.damage[todayIndex][i];
   state.damage[todayIndex][i]=!wasChecked;
   saveState();
-  if(!wasChecked){
+if(!wasChecked){
+    state.crackActive=true;
     playDamageNote();
   }else{
     play("reset");
@@ -1190,6 +1198,7 @@ if(!wasAlreadyLocked){
   let newRecord=false;
   let newAchievement=false;
 if(passed){
+  state.crackActive=false;
   state.streak++;
 
   if(recordAchievement(state.streak)){
@@ -1245,6 +1254,8 @@ sceneBackgroundHTML()+
 seasonalOverlayHTML()+
 
 rainbowHTML()+
+
+crackHTML()+
 
 ufoHTML()+
 petHTML(petType)+
