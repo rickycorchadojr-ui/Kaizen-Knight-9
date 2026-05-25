@@ -1153,16 +1153,20 @@ function toggleVow(i){
 }
 function toggleDamage(i){
   if(!requirePower()) return;
+
   let scrollTop=getCheckScrollTop();
   let wasChecked=state.damage[todayIndex][i];
+
   state.damage[todayIndex][i]=!wasChecked;
-  saveState();
-if(!wasChecked){
+
+  if(!wasChecked){
     state.crackActive=true;
     playDamageNote();
   }else{
     play("reset");
   }
+
+  saveState();
   showCheck(scrollTop);
 }
 function mintVaultCoinsForToday(){
