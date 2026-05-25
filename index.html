@@ -45,12 +45,12 @@ body{margin:0;height:100vh;background:#111;display:flex;justify-content:center;a
 position:absolute;
 top:var(--sky-top);
 left:0;
-width:300px;
+width:140px;
 height:auto;
 image-rendering:pixelated;
 image-rendering:crisp-edges;
 pointer-events:none;
-z-index:4;
+z-index:1;
 animation-duration:var(--sky-duration);
 animation-delay:var(--sky-delay);
 animation-timing-function:linear;
@@ -405,7 +405,7 @@ function ufoHTML(){
 }
 
 function planeHTML(){
-  return "<div class='sky-object fly-right' style='--sky-top:50px;--sky-duration:24s;--sky-delay:0s;'><img class='sky-img' id='planeImg' src='./Plane1.png'></div>";
+  return "<div class='sky-object fly-right' style='--sky-top:26px;--sky-duration:24s;--sky-delay:0s;'><img class='sky-img' id='planeImg' src='./Plane1.png'></div>";
 }
 
 function startSkyAnimations(){
