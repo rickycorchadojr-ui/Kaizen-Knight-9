@@ -271,12 +271,13 @@ const manualNotes=[
   ["JOURNAL BOTH ACCOUNTS","WIN: BOTH REVIEWED. FAIL: LEFT UNWRITTEN."],
   ["IF STOP HIT, NO TRADING SECOND ACCOUNT","WIN: STOP MEANS DONE. FAIL: SWITCHED ACCOUNTS."],
   ["DRILLS","WIN: PRACTICE DONE. FAIL: SKIPPED."],
-  ["SPIRALED AFTER LOSS / DON'T GET EMOTIONAL","DAMAGE: UNCHARACTERISTICALLY EMOTIONAL."],
+["SPIRALED AFTER LOSS / DON'T GET EMOTIONAL","DAMAGE: LOSS CAUSED LOSS OF CONTROL. UNCHARACTERISTICALLY EMOTIONAL."],
   ["TRADED OUTSIDE ROUTINE","DAMAGE: TRADED WITHOUT RITUAL."],
   ["RISK SETTINGS REMOVED","DAMAGE: SAFETY WAS UNLOCKED."],
   ["BOUGHT / RESET COMBINE","DAMAGE: PAID TO CONTINUE THE LOOP."]
 ];
-const APP_VERSION="5.4.3";
+const APP_VERSION="5.4.5";
+const DEBUG_MODE=true;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
 let weekKey=getWeekKey();
@@ -1034,6 +1035,18 @@ function showBoot(){
     showMain(true);
   },1200);
 }
+function debugAddStreak(){
+  if(!DEBUG_MODE) return;
+
+  state.streak++;
+
+  if(state.streak>state.bestStreak){
+    state.bestStreak=state.streak;
+  }
+
+  saveState();
+  showMain();
+}
 function showMain(fromBoot=false){
   if(!requirePower()) return;
   stopPet();
@@ -1078,7 +1091,8 @@ petHTML(petType)+
     weekText+
  "<br><span class='subline'>CLEAN DAYS: "+cleanCount()+"/6</span>"+
 "</div>"+
-"<div class='version-line'>VER "+APP_VERSION+"</div>";
+"<div class='version-line'>VER "+APP_VERSION+"</div>"+
+(DEBUG_MODE ? "<button onclick='debugAddStreak()' style='position:absolute;left:8px;bottom:4px;z-index:30;font-family:VT323;font-size:14px;background:#111;color:white;border:none;'>+STREAK</button>" : "");
   startPet(fromBoot ? 650 : 0);
 startSkyAnimations();
 }
