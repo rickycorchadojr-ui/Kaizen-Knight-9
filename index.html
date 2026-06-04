@@ -207,7 +207,28 @@ transform:scaleX(-1);
 .control-wrap:nth-child(2){transform:translateY(6px);}
 .control-wrap button{width:44px;height:44px;border-radius:50%;background:#F7CD47;color:transparent;border:none;font-family:'VT323',monospace;font-size:0;box-shadow:0 5px 0 #C99A22;}
 .control-wrap button:active{transform:translateY(3px);box-shadow:0 2px 0 #C99A22;}
-.control-label{font-family:'VT323',monospace;color:#7a7a7a;font-size:12px;line-height:1;text-transform:uppercase;letter-spacing:2px;}  </style>
+.control-label{font-family:'VT323',monospace;color:#7a7a7a;font-size:12px;line-height:1;text-transform:uppercase;letter-spacing:2px;}  
+
+.training-stat{
+  font-size:25px;
+  line-height:1;
+  text-align:center;
+  margin:8px 0;
+  padding-bottom:8px;
+  border-bottom:2px dotted #111;
+}
+.training-big{
+  font-size:34px;
+  line-height:1;
+}
+.training-bar{
+  font-size:24px;
+  letter-spacing:1px;
+  text-align:center;
+  margin:8px 0;
+  line-height:1;
+}
+</style>
 </head>
 <body>
 <div class="device">
@@ -241,11 +262,14 @@ transform:scaleX(-1);
       <div class="control-label">Code</div>
     </div>
     <div class="control-wrap">
+      <button onclick="showTrain()">TRAIN</button>
+      <div class="control-label">Train</div>
+    </div>
+    <div class="control-wrap">
       <button onclick="showGallery()">GALLERY</button>
       <div class="control-label">Gallery</div>
     </div>
   </div>
-
 
 
 </div>
@@ -382,7 +406,7 @@ const powerQuotes=[
     weight:15
   }
 ];
-const APP_VERSION="7.7.5";
+const APP_VERSION="7.8.0";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -409,6 +433,17 @@ const morningGateMotif=[
 ];
 
 const morningGateFinal="C5";
+const TRAINING_PROMOTION_DAYS=30;
+const trainingRanks=[
+  "SQUIRE",
+  "APPRENTICE",
+  "JOURNEYMAN",
+  "ADEPT",
+  "VETERAN",
+  "MASTER",
+  "GRANDMASTER",
+  "LEGEND"
+];
 function requirePower(){ return poweredOn; }
 function getTodaysVows(){ return todayIndex===0 ? sundayVows : weekdayVows; }
 function isSleepTime(){
@@ -1035,6 +1070,14 @@ crackActive:false,
 finalForm:null,
 powerQuoteDayKey:null,
 powerQuoteIndex:0,
+trainingDate:getDayKey(),
+trainingRank:0,
+trainingTarget:15,
+todayDrills:0,
+lifetimeDrills:0,
+trainingDays:0,
+trainingCompletedDays:0,
+trainingCompleteToday:false,
     achievements:{},
 records:[],
 recoveryLog:[],
@@ -1064,6 +1107,16 @@ function loadState(){
    newState.records=parsed.records || [];
 newState.recoveryLog=parsed.recoveryLog || [];
 newState.vault=parsed.vault || createFreshVault();
+
+newState.trainingDate=parsed.trainingDate || getDayKey();
+newState.trainingRank=typeof parsed.trainingRank==="number" ? parsed.trainingRank : 0;
+newState.trainingTarget=typeof parsed.trainingTarget==="number" ? parsed.trainingTarget : 15;
+newState.todayDrills=typeof parsed.todayDrills==="number" ? parsed.todayDrills : 0;
+newState.lifetimeDrills=typeof parsed.lifetimeDrills==="number" ? parsed.lifetimeDrills : 0;
+newState.trainingDays=typeof parsed.trainingDays==="number" ? parsed.trainingDays : 0;
+newState.trainingCompletedDays=typeof parsed.trainingCompletedDays==="number" ? parsed.trainingCompletedDays : 0;
+newState.trainingCompleteToday=typeof parsed.trainingCompleteToday==="boolean" ? parsed.trainingCompleteToday : false;
+
 return newState;
     }
     if(!parsed.sundayVows || parsed.sundayVows.length!==sundayVows.length) return freshState();
@@ -1090,6 +1143,15 @@ if(typeof parsed.rainbowToday==="undefined") parsed.rainbowToday=false;
 if(typeof parsed.crackActive==="undefined") parsed.crackActive=false;
 if(typeof parsed.powerQuoteDayKey==="undefined") parsed.powerQuoteDayKey=null;
 if(typeof parsed.powerQuoteIndex==="undefined") parsed.powerQuoteIndex=0;
+// TRAINING SYSTEM MIGRATION
+if(typeof parsed.trainingDate==="undefined") parsed.trainingDate=getDayKey();
+if(typeof parsed.trainingRank==="undefined") parsed.trainingRank=0;
+if(typeof parsed.trainingTarget==="undefined") parsed.trainingTarget=15;
+if(typeof parsed.todayDrills==="undefined") parsed.todayDrills=0;
+if(typeof parsed.lifetimeDrills==="undefined") parsed.lifetimeDrills=0;
+if(typeof parsed.trainingDays==="undefined") parsed.trainingDays=0;
+if(typeof parsed.trainingCompletedDays==="undefined") parsed.trainingCompletedDays=0;
+if(typeof parsed.trainingCompleteToday==="undefined") parsed.trainingCompleteToday=false;
 
 // DAILY MODE SYSTEM MIGRATION
 if(typeof parsed.modeDate==="undefined") parsed.modeDate=getDayKey();
@@ -1138,6 +1200,8 @@ function ensureDailyModeFresh(){
   state.readinessScore=null;
   state.readinessWeather=null;
   state.damageProtocolVows=Array.from({length:6},()=>Array(damageProtocolVows.length).fill(false));
+
+  resetTrainingForNewDay();
 
   saveState();
 }
@@ -2005,6 +2069,147 @@ function showCheckWithMenuSound(){
   play("menu");
   showCheckRouter();
 }
+
+function getTrainingRankName(){
+  return trainingRanks[Math.min(state.trainingRank,trainingRanks.length-1)];
+}
+
+function trainingProgressBar(){
+  const total=state.trainingTarget;
+  const filled=Math.min(state.todayDrills,total);
+  let bar="";
+
+  for(let i=0;i<total;i++){
+    bar+=i<filled ? "■" : "□";
+  }
+
+  return bar;
+}
+
+function trainingPromotionProgress(){
+  return state.trainingCompletedDays % TRAINING_PROMOTION_DAYS;
+}
+
+function resetTrainingForNewDay(){
+  const todayKey=getDayKey();
+
+  if(state.trainingDate===todayKey) return;
+
+  state.trainingDate=todayKey;
+  state.todayDrills=0;
+  state.trainingCompleteToday=false;
+}
+
+function showTrain(playSound=true){
+  if(!requirePower()) return;
+
+  resetTrainingForNewDay();
+
+  if(playSound) play("menu");
+
+  stopPet();
+  stopFirework();
+
+  document.getElementById("statusBar").innerHTML="TRAINING";
+
+  let html="";
+  html+="<div class='panel'>";
+  html+="<div class='panel-title'>TRAINING GROUNDS</div>";
+  html+="<div class='scroll'>";
+
+  html+="<div class='training-stat'>";
+  html+="<div>RANK</div>";
+  html+="<div class='training-big'>"+getTrainingRankName()+"</div>";
+  html+="</div>";
+
+  html+="<div class='training-stat'>";
+  html+="<div>TODAY</div>";
+  html+="<div class='training-bar'>"+trainingProgressBar()+"</div>";
+  html+="<div class='training-big'>"+state.todayDrills+" / "+state.trainingTarget+"</div>";
+  html+="</div>";
+
+  html+="<div class='training-stat'>";
+  html+="<div>LIFETIME DRILLS</div>";
+  html+="<div class='training-big'>"+state.lifetimeDrills+"</div>";
+  html+="</div>";
+
+  html+="<div class='training-stat'>";
+  html+="<div>TRAINING DAYS</div>";
+  html+="<div class='training-big'>"+state.trainingDays+"</div>";
+  html+="</div>";
+
+  html+="<div class='small-note'>NEXT PROMOTION: "+trainingPromotionProgress()+" / "+TRAINING_PROMOTION_DAYS+" DAYS</div>";
+
+  html+="</div>";
+  html+="<div class='panel-buttons'>";
+  html+="<button class='mini-btn' onclick='addTrainingDrill()'>+1 DRILL</button>";
+  html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
+  html+="</div>";
+  html+="</div>";
+
+  document.getElementById("playArea").innerHTML=html;
+
+  saveState();
+}
+
+function addTrainingDrill(){
+  if(!requirePower()) return;
+
+  resetTrainingForNewDay();
+
+  state.todayDrills++;
+  state.lifetimeDrills++;
+
+  let promoted=false;
+
+  if(state.todayDrills>=state.trainingTarget && !state.trainingCompleteToday){
+    state.trainingCompleteToday=true;
+    state.trainingDays++;
+    state.trainingCompletedDays++;
+
+    if(state.trainingCompletedDays>0 && state.trainingCompletedDays%TRAINING_PROMOTION_DAYS===0){
+      state.trainingRank++;
+      state.trainingTarget++;
+      promoted=true;
+    }
+  }
+
+  saveState();
+
+  if(promoted){
+    play("resolve");
+    showTrainingPromotion();
+    return;
+  }
+
+  if(state.trainingCompleteToday && state.todayDrills===state.trainingTarget){
+    play("good");
+  }else{
+    playVowNote(state.todayDrills);
+  }
+
+  showTrain(false);
+}
+
+function showTrainingPromotion(){
+  document.getElementById("statusBar").innerHTML="PROMOTION";
+
+  document.getElementById("playArea").innerHTML=
+    "<div class='panel'>"+
+    "<div class='panel-title'>PROMOTION</div>"+
+    "<div class='scroll' style='display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;'>"+
+    "<div class='training-stat' style='border-bottom:none;'>"+
+    "<div class='training-big'>"+getTrainingRankName()+"</div>"+
+    "<div style='font-size:24px;margin-top:12px;'>TARGET INCREASED</div>"+
+    "<div class='training-big'>"+state.trainingTarget+"</div>"+
+    "</div>"+
+    "</div>"+
+    "<div class='panel-buttons'>"+
+    "<button class='mini-btn' onclick='showTrain()'>CONTINUE</button>"+
+    "</div>"+
+    "</div>";
+}
+
 function showCode(){
   if(!requirePower()) return;
   play("menu");
@@ -2724,6 +2929,15 @@ state.weekKey=weekKey;
 if(!state.records) state.records=[];
 if(!state.recoveryLog) state.recoveryLog=[];
 if(!state.vault) state.vault=createFreshVault();
+if(typeof state.trainingDate==="undefined") state.trainingDate=getDayKey();
+if(typeof state.trainingRank==="undefined") state.trainingRank=0;
+if(typeof state.trainingTarget==="undefined") state.trainingTarget=15;
+if(typeof state.todayDrills==="undefined") state.todayDrills=0;
+if(typeof state.lifetimeDrills==="undefined") state.lifetimeDrills=0;
+if(typeof state.trainingDays==="undefined") state.trainingDays=0;
+if(typeof state.trainingCompletedDays==="undefined") state.trainingCompletedDays=0;
+if(typeof state.trainingCompleteToday==="undefined") state.trainingCompleteToday=false;
+
 
 ensureVault();
 repairWeeklyStatusesFromChecklist();
@@ -2743,6 +2957,7 @@ saveState();
   }
 }
 ensureDailyModeFresh();
+resetTrainingForNewDay();
 state.crackActive=anyDamageActive();
 saveState();
 rollRainbowForToday();
