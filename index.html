@@ -231,6 +231,49 @@ transform:scaleX(-1);
   margin:8px 0;
   line-height:1;
 }
+
+.trolley-scene{
+  position:relative;
+  height:86px;
+  margin:10px 0 14px;
+  border-bottom:2px dotted #111;
+}
+
+.trolley-track{
+  position:absolute;
+  left:26px;
+  right:26px;
+  top:42px;
+  border-top:4px solid #111;
+}
+
+.trolley-home{
+  position:absolute;
+  left:0;
+  top:20px;
+  font-size:32px;
+  line-height:1;
+}
+
+.trolley-castle{
+  position:absolute;
+  right:0;
+  top:18px;
+  font-size:34px;
+  line-height:1;
+}
+
+.trolley-car{
+  position:absolute;
+  top:30px;
+  left:var(--trolley-left);
+  transform:translateX(-50%);
+  font-size:30px;
+  line-height:1;
+  transition:left .25s ease-out;
+  z-index:2;
+}
+
 </style>
 </head>
 <body>
@@ -409,7 +452,7 @@ const powerQuotes=[
     weight:15
   }
 ];
-const APP_VERSION="7.8.3";
+const APP_VERSION="7.8.4";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -438,13 +481,25 @@ const morningGateMotif=[
 const morningGateFinal="C5";
 const TRAINING_PROMOTION_DAYS=30;
 const trainingRanks=[
+  "PAGE",
   "SQUIRE",
   "APPRENTICE",
   "JOURNEYMAN",
   "ADEPT",
   "VETERAN",
+  "KNIGHT",
+  "KNIGHT CAPTAIN",
+  "KNIGHT COMMANDER",
+  "CHAMPION",
   "MASTER",
+  "HIGH MASTER",
   "GRANDMASTER",
+  "WARDEN",
+  "SENTINEL",
+  "PALADIN",
+  "LORD PALADIN",
+  "MARSHAL",
+  "HIGH MARSHAL",
   "LEGEND"
 ];
 function requirePower(){ return poweredOn; }
@@ -2092,6 +2147,19 @@ function trainingProgressBar(){
   return bar;
 }
 
+function trainingTrolleyHTML(){
+  const progress=Math.min(state.todayDrills/state.trainingTarget,1);
+  const left=12+(progress*76);
+
+  return ""+
+    "<div class='trolley-scene'>"+
+    "<div class='trolley-home'>⌂</div>"+
+    "<div class='trolley-track'></div>"+
+    "<div class='trolley-castle'>♜</div>"+
+    "<div class='trolley-car' style='--trolley-left:"+left+"%;'>▣</div>"+
+    "</div>";
+}
+
 function trainingPromotionProgress(){
   return state.trainingCompletedDays % TRAINING_PROMOTION_DAYS;
 }
@@ -2125,10 +2193,11 @@ function showTrain(playSound=true){
   html+="<div class='scroll'>";
 
   html+="<div class='training-stat'>";
-  html+="<div>TODAY</div>";
-  html+="<div class='training-bar'>"+trainingProgressBar()+"</div>";
-  html+="<div class='training-big'>"+state.todayDrills+" / "+state.trainingTarget+"</div>";
-  html+="</div>";
+html+="<div>TODAY'S JOURNEY</div>";
+html+=trainingTrolleyHTML();
+html+="<div class='training-bar'>"+trainingProgressBar()+"</div>";
+html+="<div class='training-big'>"+state.todayDrills+" / "+state.trainingTarget+"</div>";
+html+="</div>";
 
   html+="<div class='training-stat'>";
   html+="<div>LIFETIME DRILLS</div>";
@@ -2245,9 +2314,10 @@ function showTrainingPromotion(){
     "<div class='panel-title'>PROMOTION</div>"+
     "<div class='scroll' style='display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;'>"+
     "<div class='training-stat' style='border-bottom:none;'>"+
-    "<div class='training-big'>"+getTrainingRankName()+"</div>"+
-    "<div style='font-size:24px;margin-top:12px;'>TARGET INCREASED</div>"+
-    "<div class='training-big'>"+state.trainingTarget+"</div>"+
+"<div style='font-size:24px;margin-bottom:12px;'>THE TROLLEY HAS REACHED THE CASTLE</div>"+
+"<div class='training-big'>"+getTrainingRankName()+"</div>"+
+"<div style='font-size:24px;margin-top:12px;'>TARGET INCREASED</div>"+
+"<div class='training-big'>"+state.trainingTarget+"</div>"+    
     "</div>"+
     "</div>"+
     "<div class='panel-buttons'>"+
