@@ -456,6 +456,46 @@ const damageRepairSteps=[
   "REVIEW JOURNALS",
   "WALK BEFORE OPEN"
 ];
+const actionMarketConditions=[
+  "CHOP",
+  "VOLATILITY",
+  "LOW VOLUME",
+  "NEWS",
+  "REVERSAL",
+  "SLOW OPEN",
+  "POOR FOLLOW THROUGH"
+];
+
+const actionLessons=[
+  "WAIT LONGER",
+  "AVOID CHOP",
+  "RESPECT VOLATILITY",
+  "TAKE PROFITS SOONER",
+  "REDUCE SIZE TOMORROW",
+  "BE MORE PATIENT",
+  "NO CHANGE NEEDED"
+];
+
+const actionStates=[
+  "FRUSTRATED",
+  "DISAPPOINTED",
+  "ANGRY",
+  "TIRED",
+  "DISCOURAGED",
+  "CALM",
+  "PROUD BUT HURT"
+];
+
+const actionReframes=[
+  "I FOLLOWED MY RULES",
+  "GOOD TRADES CAN LOSE",
+  "DISCIPLINE WAS ACHIEVED",
+  "TODAY PRODUCED INFORMATION",
+  "LOSSES ARE TUITION",
+  "PROCESS OVER OUTCOME",
+  "THE SYSTEM HELD"
+];
+
 const codeNotes=[
   "KAIZEN KNIGHT EXISTS TO PRESERVE READINESS.",
   "INTEGRITY PROTECTS THE SYSTEM.",
@@ -703,7 +743,7 @@ const powerQuotes=[
   }
 ];
 
-const APP_VERSION="8.1.1";
+const APP_VERSION="8.2.2";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -1098,6 +1138,87 @@ function recoveryCountThisMonth(){
 
   return count;
 }
+
+function actionReportCompleted(){
+  return (
+    state.actionCondition!==null ||
+    state.actionLesson!==null ||
+    state.actionState!==null ||
+    state.actionReframe!==null
+  );
+}
+
+function actionReportCount(){
+  if(!state.actionLog) return 0;
+  return state.actionLog.length;
+}
+
+function mostCommonActionField(field){
+  if(!state.actionLog || state.actionLog.length<=0) return "NONE";
+
+  let counts={};
+
+  for(let i=0;i<state.actionLog.length;i++){
+    let value=state.actionLog[i][field];
+
+    if(value===null || typeof value==="undefined") continue;
+
+    counts[value]=(counts[value] || 0)+1;
+  }
+
+  let best=null;
+  let bestCount=0;
+
+  for(let key in counts){
+    if(counts[key]>bestCount){
+      best=key;
+      bestCount=counts[key];
+    }
+  }
+
+  if(best===null) return "NONE";
+
+  best=parseInt(best,10);
+
+  if(field==="condition") return actionMarketConditions[best] || "NONE";
+  if(field==="lesson") return actionLessons[best] || "NONE";
+  if(field==="state") return actionStates[best] || "NONE";
+  if(field==="reframe") return actionReframes[best] || "NONE";
+
+  return "NONE";
+}
+
+function logActionReport(){
+  if(!actionReportCompleted()) return;
+
+  if(!state.actionLog) state.actionLog=[];
+
+  const dayKey=getDayKey();
+
+  for(let i=0;i<state.actionLog.length;i++){
+    if(state.actionLog[i].dayKey===dayKey){
+      state.actionLog[i]={
+        dayKey:dayKey,
+        date:formatToday(),
+        condition:state.actionCondition,
+        lesson:state.actionLesson,
+        state:state.actionState,
+        reframe:state.actionReframe
+      };
+      return;
+    }
+  }
+
+  state.actionLog.push({
+    dayKey:dayKey,
+    date:formatToday(),
+    condition:state.actionCondition,
+    lesson:state.actionLesson,
+    state:state.actionState,
+    reframe:state.actionReframe
+  });
+}
+
 function formatWeekDisplay(){
   const d=new Date(weekKey+"T00:00:00");
 
@@ -1411,6 +1532,10 @@ recoveryChosen:false,
 damageProtocolActive:false,
 damageFailure:null,
 damageRepair:null,
+actionCondition:null,
+actionLesson:null,
+actionState:null,
+actionReframe:null,
 gateAnswers:Array(gateQuestions.length).fill(false),
 readinessScore:null,
 readinessWeather:null,
@@ -1435,6 +1560,7 @@ trainingPromotedToday:false,
     achievements:{},
 records:[],
 recoveryLog:[],
+actionLog:[],
 vault:createFreshVault(),
 statuses:["inactive","inactive","inactive","inactive","inactive","inactive"],
     sundayVows:Array(sundayVows.length).fill(false),
@@ -1460,6 +1586,7 @@ function loadState(){
       newState.achievements=parsed.achievements || {};
    newState.records=parsed.records || [];
 newState.recoveryLog=parsed.recoveryLog || [];
+newState.actionLog=parsed.actionLog || [];
 newState.vault=parsed.vault || createFreshVault();
 
 newState.trainingDate=parsed.trainingDate || getDayKey();
@@ -1518,6 +1645,10 @@ if(typeof parsed.recoveryChosen==="undefined") parsed.recoveryChosen=false;
 if(typeof parsed.damageProtocolActive==="undefined") parsed.damageProtocolActive=false;
 if(typeof parsed.damageFailure==="undefined") parsed.damageFailure=null;
 if(typeof parsed.damageRepair==="undefined") parsed.damageRepair=null;
+if(typeof parsed.actionCondition==="undefined") parsed.actionCondition=null;
+if(typeof parsed.actionLesson==="undefined") parsed.actionLesson=null;
+if(typeof parsed.actionState==="undefined") parsed.actionState=null;
+if(typeof parsed.actionReframe==="undefined") parsed.actionReframe=null;
 if(!parsed.gateAnswers || parsed.gateAnswers.length!==gateQuestions.length){
   parsed.gateAnswers=Array(gateQuestions.length).fill(false);
 }
@@ -1530,6 +1661,7 @@ if(!parsed.damageProtocolVows || parsed.damageProtocolVows.length!==6 || parsed.
 if(!parsed.achievements) parsed.achievements={};
    if(!parsed.records) parsed.records=[];
 if(!parsed.recoveryLog) parsed.recoveryLog=[];
+if(!parsed.actionLog) parsed.actionLog=[];
 if(!parsed.vault) parsed.vault=createFreshVault();
 return parsed;
   }catch(e){
@@ -1556,6 +1688,10 @@ function ensureDailyModeFresh(){
 state.damageProtocolActive=false;
 state.damageFailure=null;
 state.damageRepair=null;
+state.actionCondition=null;
+state.actionLesson=null;
+state.actionState=null;
+state.actionReframe=null;
 state.gateAnswers=Array(gateQuestions.length).fill(false);
   state.readinessScore=null;
   state.readinessWeather=null;
@@ -2125,6 +2261,7 @@ for(let i=0;i<growthVows.length;i++){
   html+="</div>";
 html+="<div class='panel-buttons'>";
 html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
+html+="<button class='mini-btn' onclick='showAfterActionReport()'>REPORT</button>";
 html+="<button class='mini-btn' onclick='lockDay()'>LOCK</button>";
 html+="</div>";
  html+="</div>";
@@ -2173,6 +2310,7 @@ function showLightSessionCheck(restoreScroll=null){
   html+="</div>";
   html+="<div class='panel-buttons'>";
   html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
+  html+="<button class='mini-btn' onclick='showAfterActionReport()'>REPORT</button>";
   html+="<button class='mini-btn' onclick='lockDay()'>LOCK</button>";
   html+="</div>";
   html+="</div>";
@@ -2317,6 +2455,125 @@ function toggleRecoveryDamage(i){
 
   saveState();
   showRecoveryCheck(scrollTop);
+}
+function showAfterActionReport(){
+  if(!requirePower()) return;
+  if(todayIndex<0){
+    showMain();
+    return;
+  }
+
+  stopPet();
+  stopFirework();
+
+  document.getElementById("statusBar").innerHTML="AFTER ACTION";
+
+  let html="";
+  html+="<div class='panel'>";
+  html+="<div class='panel-title'>AFTER ACTION REPORT</div>";
+  html+="<div class='scroll'>";
+  html+="<div class='small-note'>LOSS IS NOT DAMAGE. RECORD THE LESSON.</div>";
+
+  html+="<div class='section-label'>MARKET CONDITION</div>";
+  for(let i=0;i<actionMarketConditions.length;i++){
+    html+="<div class='rule'>";
+    html+="<div class='box "+(state.actionCondition===i?"checked":"")+"' onclick='chooseActionCondition("+i+")'></div>";
+    html+="<div>"+actionMarketConditions[i]+"</div>";
+    html+="</div>";
+  }
+
+  html+="<div class='section-label'>LESSON</div>";
+  for(let i=0;i<actionLessons.length;i++){
+    html+="<div class='rule'>";
+    html+="<div class='box "+(state.actionLesson===i?"checked":"")+"' onclick='chooseActionLesson("+i+")'></div>";
+    html+="<div>"+actionLessons[i]+"</div>";
+    html+="</div>";
+  }
+
+  html+="<div class='section-label'>STATE</div>";
+  for(let i=0;i<actionStates.length;i++){
+    html+="<div class='rule'>";
+    html+="<div class='box "+(state.actionState===i?"checked":"")+"' onclick='chooseActionState("+i+")'></div>";
+    html+="<div>"+actionStates[i]+"</div>";
+    html+="</div>";
+  }
+
+  html+="<div class='section-label'>REFRAME</div>";
+  for(let i=0;i<actionReframes.length;i++){
+    html+="<div class='rule'>";
+    html+="<div class='box "+(state.actionReframe===i?"checked":"")+"' onclick='chooseActionReframe("+i+")'></div>";
+    html+="<div>"+actionReframes[i]+"</div>";
+    html+="</div>";
+  }
+
+  html+="</div>";
+  html+="<div class='panel-buttons'>";
+  html+="<button class='mini-btn' onclick='showCheckRouter()'>CHECK</button>";
+  html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
+  html+="</div>";
+  html+="</div>";
+
+  document.getElementById("playArea").innerHTML=html;
+}
+
+function chooseActionCondition(i){
+  if(!requirePower()) return;
+
+  if(state.actionCondition===i){
+    state.actionCondition=null;
+    play("reset");
+  }else{
+    state.actionCondition=i;
+    playVowNote(i);
+  }
+
+  saveState();
+  showAfterActionReport();
+}
+
+function chooseActionLesson(i){
+  if(!requirePower()) return;
+
+  if(state.actionLesson===i){
+    state.actionLesson=null;
+    play("reset");
+  }else{
+    state.actionLesson=i;
+    playVowNote(i+1);
+  }
+
+  saveState();
+  showAfterActionReport();
+}
+
+function chooseActionState(i){
+  if(!requirePower()) return;
+
+  if(state.actionState===i){
+    state.actionState=null;
+    play("reset");
+  }else{
+    state.actionState=i;
+    playVowNote(i+2);
+  }
+
+  saveState();
+  showAfterActionReport();
+}
+
+function chooseActionReframe(i){
+  if(!requirePower()) return;
+
+  if(state.actionReframe===i){
+    state.actionReframe=null;
+    play("reset");
+  }else{
+    state.actionReframe=i;
+    play("good");
+  }
+
+  saveState();
+  showAfterActionReport();
 }
 
 function showDamageDiagnosis(){
@@ -3109,6 +3366,10 @@ html+="<div class='gallery-title'>";
 
 html+="<div class='record-line'>REST THIS WEEK: "+recoveryCountThisWeek()+"</div>";
 html+="<div class='record-line'>REST THIS MONTH: "+recoveryCountThisMonth()+"</div>";
+html+="<div class='record-line'>AFTER ACTION REPORTS: "+actionReportCount()+"</div>";
+html+="<div class='record-line'>TOP CONDITION: "+mostCommonActionField("condition")+"</div>";
+html+="<div class='record-line'>TOP LESSON: "+mostCommonActionField("lesson")+"</div>";
+html+="<div class='record-line'>TOP STATE: "+mostCommonActionField("state")+"</div>";
 
 if(!state.records || state.records.length<=0){
   html+="<div class='small-note' style='margin-top:14px;'>NO WEEK RECORDS YET</div>";
@@ -3312,6 +3573,7 @@ if(state.dayMode==="recovery" && passed){
 
 if(passed){
   state.crackActive=false;
+  logActionReport();
 
   if(state.dayMode!=="recovery"){
     state.streak++;
@@ -3506,6 +3768,7 @@ state.weekKey=weekKey;
     if(!state.achievements) state.achievements={};
 if(!state.records) state.records=[];
 if(!state.recoveryLog) state.recoveryLog=[];
+if(!state.actionLog) state.actionLog=[];
 if(!state.vault) state.vault=createFreshVault();
 if(typeof state.trainingDate==="undefined") state.trainingDate=getDayKey();
 if(typeof state.trainingRank==="undefined") state.trainingRank=0;
@@ -3516,6 +3779,10 @@ if(typeof state.trainingDays==="undefined") state.trainingDays=0;
 if(typeof state.trainingCompletedDays==="undefined") state.trainingCompletedDays=0;
 if(typeof state.trainingCompleteToday==="undefined") state.trainingCompleteToday=false;
 if(typeof state.trainingPromotedToday==="undefined") state.trainingPromotedToday=false;
+if(typeof state.actionCondition==="undefined") state.actionCondition=null;
+if(typeof state.actionLesson==="undefined") state.actionLesson=null;
+if(typeof state.actionState==="undefined") state.actionState=null;
+if(typeof state.actionReframe==="undefined") state.actionReframe=null;
 
 
 ensureVault();
