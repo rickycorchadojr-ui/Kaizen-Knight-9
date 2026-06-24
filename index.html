@@ -126,6 +126,62 @@ transform:scaleX(-1);
 .pet-walker.right .santa-hat{transform:scaleX(-1);}
 .pet-walker.left .santa-hat{transform:scaleX(1);}
 @keyframes bob{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+.visitor-zone{
+  width:220px;
+  height:120px;
+  position:absolute;
+  left:50%;
+  bottom:86px;
+  transform:translateX(-50%);
+  z-index:2;
+  pointer-events:none;
+}
+
+.visitor-walker{
+  position:absolute;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+}
+
+.visitor-bob{
+  animation:bob 1.2s infinite steps(2);
+  position:relative;
+  width:112px;
+  height:112px;
+}
+
+.visitor-img{
+  width:112px;
+  height:112px;
+  display:block;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  object-fit:contain;
+  opacity:.88;
+}
+
+.visitor-sleep-overlay{
+  width:112px;
+  height:112px;
+  position:absolute;
+  left:0;
+  top:0;
+  display:none;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  object-fit:contain;
+  pointer-events:none;
+  z-index:4;
+}
+
+.visitor-walker.right .visitor-img{
+  transform:scaleX(-1);
+}
+
+.visitor-walker.left .visitor-img{
+  transform:scaleX(1);
+}
 .ground{width:100px;border-bottom:4px solid #111;margin-bottom:14px;position:relative;z-index:2;}
 .textbox{width:100%;background:#f8f8f8;border-top:4px solid #111;padding:9px;box-sizing:border-box;text-align:center;font-size:24px;line-height:1.03;position:relative;z-index:3;}
 .subline{font-size:20px;opacity:.9;}
@@ -753,7 +809,7 @@ const powerQuotes=[
   }
 ];
 
-const APP_VERSION="8.2.7";
+const APP_VERSION="8.2.9";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -763,6 +819,10 @@ let moveTimer=null;
 let sleepTimer=null;
 let gateTimer=null;
 let flagTimer=null;
+let visitorTimer=null;
+let visitorSleepTimer=null;
+let visitorStep=0;
+let visitorSleepFrame=1;
 let flagFrame=1;
 let sleepFrame=1;
 let petStep=0;
@@ -1112,9 +1172,11 @@ function awardRecoveryDay(){
     // achievement is recorded silently here
   }
 
-  if(state.streak>state.bestStreak && state.streak<=365){
+    if(state.streak>state.bestStreak && state.streak<=365){
     state.bestStreak=state.streak;
   }
+
+  finalizeWeekIfFriday();
 
   state.crackActive=false;
 }
@@ -1577,6 +1639,9 @@ rainbowDayKey:null,
 rainbowToday:false,
 crackActive:false,
 finalForm:null,
+lastWeekCompanionForm:null,
+companionWeekKey:null,
+companionVisitDay:null,
 powerQuoteDayKey:null,
 powerQuoteIndex:0,
 trainingDate:getDayKey(),
@@ -1619,6 +1684,14 @@ function loadState(){
 newState.recoveryLog=parsed.recoveryLog || [];
 newState.actionLog=parsed.actionLog || [];
 newState.vault=parsed.vault || createFreshVault();
+const previousWeekForm = parsed.finalForm || parsed.lastWeekCompanionForm || null;
+
+newState.lastWeekCompanionForm = previousWeekForm;
+
+if(previousWeekForm){
+  newState.companionWeekKey = weekKey;
+  newState.companionVisitDay = Math.floor(Math.random()*6);
+}
 
 newState.trainingDate=parsed.trainingDate || getDayKey();
 newState.trainingRank=typeof parsed.trainingRank==="number" ? parsed.trainingRank : 0;
@@ -1651,6 +1724,9 @@ if(!parsed.recoveryDamage || parsed.recoveryDamage.length!==6 || parsed.recovery
     if(typeof parsed.streak!=="number") parsed.streak=cleanCountFromStatuses(parsed.statuses);
     if(typeof parsed.bestStreak!=="number") parsed.bestStreak=parsed.streak;
 if(typeof parsed.finalForm==="undefined") parsed.finalForm=null;
+if(typeof parsed.lastWeekCompanionForm==="undefined") parsed.lastWeekCompanionForm=null;
+if(typeof parsed.companionWeekKey==="undefined") parsed.companionWeekKey=null;
+if(typeof parsed.companionVisitDay==="undefined") parsed.companionVisitDay=null;
 if(typeof parsed.rainbowDayKey==="undefined") parsed.rainbowDayKey=null;
 if(typeof parsed.rainbowToday==="undefined") parsed.rainbowToday=false;
 if(typeof parsed.crackActive==="undefined") parsed.crackActive=false;
@@ -1852,9 +1928,123 @@ function petHTML(type="knight"){
     </div>
   `;
 }
+function shouldShowWeeklyVisitor(){
+  if(todayIndex<0) return false;
+  if(state.companionWeekKey!==weekKey) return false;
+  if(state.companionVisitDay!==todayIndex) return false;
+  if(!state.lastWeekCompanionForm) return false;
+  return true;
+}
+
+function weeklyVisitorHTML(){
+  if(!shouldShowWeeklyVisitor()) return "";
+
+  const type=state.lastWeekCompanionForm;
+  let img=getPetImage(type);
+
+  if(isSleepTime() && canPetBlink(type)){
+    img=getPetBlinkImage(type);
+  }
+
+  return `
+    <div class="visitor-zone">
+      <div class="visitor-walker left" id="visitorWalker">
+        <div class="visitor-bob">
+          <img class="visitor-img" id="visitorImg" src="${img}" data-pet-type="${type}">
+          <img class="visitor-sleep-overlay" id="visitorSleepOverlay" src="sleep1.png">
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function stopWeeklyVisitor(){
+  clearInterval(visitorTimer);
+  clearInterval(visitorSleepTimer);
+  visitorTimer=null;
+  visitorSleepTimer=null;
+  visitorStep=0;
+  visitorSleepFrame=1;
+}
+
+function startWeeklyVisitor(){
+  stopWeeklyVisitor();
+
+  const walker=document.getElementById("visitorWalker");
+  const img=document.getElementById("visitorImg");
+  const overlay=document.getElementById("visitorSleepOverlay");
+
+  if(!walker || !img) return;
+
+  visitorStep=3;
+  walker.style.left=petPositions[visitorStep]+"%";
+  walker.className="visitor-walker left";
+
+  function updateVisitorSleep(){
+    if(!overlay) return;
+
+    if(!isSleepTime()){
+      overlay.style.display="none";
+      return;
+    }
+
+    overlay.style.display="block";
+    visitorSleepFrame=visitorSleepFrame===1 ? 2 : 1;
+    overlay.src="sleep"+visitorSleepFrame+".png";
+  }
+
+  updateVisitorSleep();
+
+  visitorSleepTimer=setInterval(()=>{
+    updateVisitorSleep();
+  },500);
+
+  visitorTimer=setInterval(()=>{
+    const currentWalker=document.getElementById("visitorWalker");
+    const currentImg=document.getElementById("visitorImg");
+
+    if(!currentWalker || !currentImg){
+      stopWeeklyVisitor();
+      return;
+    }
+
+    const type=currentImg.dataset.petType;
+
+    if(isSleepTime()){
+      currentWalker.className="visitor-walker left";
+
+      if(canPetBlink(type)){
+        currentImg.src=getPetBlinkImage(type);
+      }else{
+        currentImg.src=getPetImage(type);
+      }
+
+      return;
+    }
+
+    const current=petPositions[visitorStep];
+    visitorStep=(visitorStep+1)%petPositions.length;
+    const next=petPositions[visitorStep];
+
+    if(next>current){
+      currentWalker.className="visitor-walker right";
+      currentImg.src=getPetImage(type);
+    }else if(next<current){
+      currentWalker.className="visitor-walker left";
+      currentImg.src=getPetImage(type);
+    }else{
+      if(canPetBlink(type)){
+        currentImg.src=getPetBlinkImage(type);
+      }
+    }
+
+    currentWalker.style.left=next+"%";
+  },1400);
+}
 function stopPet(){
   clearInterval(moveTimer);
   clearInterval(sleepTimer);
+  stopWeeklyVisitor();
   stopFlagAnimation();
   moveTimer=null;
   sleepTimer=null;
@@ -2095,6 +2285,21 @@ function addWeekRecord(weeklyForm){
     rooks:weeklyRookCount()
   });
 }
+function finalizeWeekIfFriday(){
+  if(todayIndex!==5) return;
+
+  let weeklyForm=null;
+
+  if(perfectWeek()){
+    weeklyForm="angel";
+  }else{
+    weeklyForm=formFromWeeklyPercent(weeklyVowPercent());
+  }
+
+  state.finalForm=weeklyForm;
+  state.lastWeekCompanionForm=weeklyForm;
+  addWeekRecord(weeklyForm);
+}
 function shouldShowFinalForm(){ return state.finalForm && (todayIndex===5 || todayIndex===-1); }
 function powerOn(){
   if(poweredOn) return;
@@ -2227,8 +2432,9 @@ document.getElementById("statusBar").innerHTML=status;
     streakHTML()+
     sceneBackgroundHTML()+
 
-flagHTML()+
+weeklyVisitorHTML()+
 
+flagHTML()+
 seasonalOverlayHTML()+
 rainbowHTML()+
 
@@ -2246,6 +2452,7 @@ petHTML(petType)+
 "<div class='version-line'>VER "+APP_VERSION+"</div>"+
 (DEBUG_MODE ? "<button onclick='debugAddStreak()' style='position:absolute;left:8px;bottom:4px;z-index:30;font-family:VT323;font-size:14px;background:#111;color:white;border:none;'>+STREAK</button>" : "");
 startPet(fromBoot ? 650 : 0);
+startWeeklyVisitor();
 startSkyAnimations();
 startFlagAnimation();
 updateStreakMusic();
@@ -3224,37 +3431,44 @@ function submitGateTest(){
 
   state.gateCompleted=true;
 
-if(missed>=GATE_FAIL_LIMIT){
-  state.dayMode="recovery";
-  state.gatePassed=false;
-  state.recoveryChosen=true;
+  if(missed>=GATE_FAIL_LIMIT){
+    const score=getReadinessScore();
+
+    if(!confirm("READINESS IS "+score+"%. ASSIGN RECOVERY DAY?")){
+      play("reset");
+      showTradeGateTest();
+      return;
+    }
+
+    state.dayMode="recovery";
+    state.gatePassed=false;
+    state.recoveryChosen=true;
+    state.readinessScore=score;
+    state.readinessWeather="STORM";
+
+    awardRecoveryDay();
+
+    saveState();
+    playMorningGateFinal();
+    showGateFailedScreen();
+    return;
+  }
+
+  state.gatePassed=true;
   state.readinessScore=getReadinessScore();
-  state.readinessWeather="STORM";
 
-  awardRecoveryDay();
+  if(missed>=GATE_LIGHT_LIMIT){
+    state.dayMode="light";
+    state.readinessWeather="CLOUDY";
+  }else{
+    state.dayMode="trade";
+    state.readinessWeather=getReadinessWeather(state.readinessScore);
+  }
 
-saveState();
-playMorningGateFinal();
-showGateFailedScreen();
-return;
+  saveState();
+  playMorningGateFinal();
+  showGatePassedScreen();
 }
-
-state.gatePassed=true;
-state.readinessScore=getReadinessScore();
-
-if(missed>=GATE_LIGHT_LIMIT){
-  state.dayMode="light";
-  state.readinessWeather="CLOUDY";
-}else{
-  state.dayMode="trade";
-  state.readinessWeather=getReadinessWeather(state.readinessScore);
-}
-
-saveState();
-playMorningGateFinal();
-showGatePassedScreen();
-}
-
 function getReadinessScore(){
   let checked=0;
 
@@ -3660,6 +3874,7 @@ if(state.dayMode==="trade" || state.dayMode==="light"){
     }
 
     state.finalForm=weeklyForm;
+    state.lastWeekCompanionForm=weeklyForm;
     addWeekRecord(weeklyForm);
   }
 
@@ -3706,6 +3921,7 @@ if(state.dayMode==="damage" && state.damageProtocolActive){
     achievementHTML()+
     streakHTML()+
     sceneBackgroundHTML()+
+    weeklyVisitorHTML()+
     flagHTML()+
     seasonalOverlayHTML()+
     rainbowHTML()+
@@ -3720,6 +3936,7 @@ if(state.dayMode==="damage" && state.damageProtocolActive){
     "</div>";
 
   startPet();
+  startWeeklyVisitor();
   startSkyAnimations();
   startFlagAnimation();
   updateStreakMusic();
