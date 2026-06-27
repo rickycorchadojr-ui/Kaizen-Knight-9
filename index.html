@@ -372,6 +372,156 @@ transform:scaleX(-1);
   image-rendering:crisp-edges;
 }
 
+/* ── DESIGN ENHANCEMENTS ───────────────────────────────────────────── */
+
+/* Panel fade-in */
+@keyframes panelIn{
+  0%{opacity:0;transform:translateY(6px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+.panel,.gallery-wrap{
+  animation:panelIn .18s ease-out both;
+}
+
+/* Scanline texture overlay on screen */
+.screen::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,.04) 3px,
+    rgba(0,0,0,.04) 4px
+  );
+  z-index:100;
+  border-radius:12px;
+}
+.screen{position:relative;}
+
+/* Screen ambient glow */
+@keyframes screenGlow{
+  0%,100%{box-shadow:0 0 0 0px rgba(52,98,69,.0),0 8px 0 #555;}
+  50%{box-shadow:0 0 18px 4px rgba(52,98,69,.18),0 8px 0 #555;}
+}
+.screen{
+  animation:screenGlow 4s ease-in-out infinite;
+}
+.screen.glow-fail{
+  animation:screenGlowFail 4s ease-in-out infinite;
+}
+@keyframes screenGlowFail{
+  0%,100%{box-shadow:0 0 0 0px rgba(217,56,49,.0),0 8px 0 #555;}
+  50%{box-shadow:0 0 18px 4px rgba(217,56,49,.15),0 8px 0 #555;}
+}
+
+/* Streak counter pulse when active */
+@keyframes streakPulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.08);}
+}
+.streak-counter.active{
+  animation:streakPulse 2.4s ease-in-out infinite;
+}
+
+/* Day tile hover transition */
+.day{
+  transition:transform .1s ease,box-shadow .1s ease;
+  cursor:default;
+}
+
+/* Button lift & shimmer */
+.control-wrap button{
+  transition:transform .08s ease,box-shadow .08s ease;
+  position:relative;
+  overflow:hidden;
+}
+.control-wrap button::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.45),transparent 70%);
+  pointer-events:none;
+}
+.control-wrap button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 7px 0 #C99A22;
+}
+
+/* Mini-btn hover lift */
+.mini-btn{
+  transition:transform .08s ease,box-shadow .08s ease,opacity .08s ease;
+  position:relative;
+  overflow:hidden;
+}
+.mini-btn:hover{
+  opacity:.88;
+  transform:translateY(-1px);
+  box-shadow:0 5px 0 #333;
+}
+.mini-btn:active{
+  transform:translateY(3px);
+  box-shadow:0 1px 0 #333;
+}
+
+/* Ripple on mini-btn click */
+@keyframes ripple{
+  to{transform:scale(4);opacity:0;}
+}
+.mini-btn .ripple-el{
+  position:absolute;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:rgba(255,255,255,.22);
+  transform:scale(0);
+  animation:ripple .5s linear;
+  pointer-events:none;
+}
+
+/* Checkbox checked flash */
+@keyframes boxFlash{
+  0%{background:#111;}
+  40%{background:#346245;}
+  100%{background:#111;}
+}
+.box.just-checked{
+  animation:boxFlash .25s ease-out both;
+}
+
+/* Device subtle noise texture */
+.device{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E"),linear-gradient(to bottom,#F0F0F0,#ECECEC);
+  background-blend-mode:multiply,normal;
+}
+
+/* Smooth scroll for panels */
+.scroll{
+  scroll-behavior:smooth;
+}
+
+/* Power quote hover cue */
+.power-quote{
+  transition:opacity .15s ease,transform .15s ease;
+  cursor:pointer;
+}
+.power-quote:hover{
+  opacity:.88;
+  transform:scale(.99);
+}
+
+/* Week-form text animation on status bar */
+@keyframes statusPulse{
+  0%,100%{opacity:1;}
+  50%{opacity:.65;}
+}
+#statusBar.pulsing{
+  animation:statusPulse 1.8s ease-in-out infinite;
+}
+
 </style>
 </head>
 <body>
@@ -564,19 +714,24 @@ const actionReframes=[
 
 const codeNotes=[
   "KAIZEN KNIGHT EXISTS TO PRESERVE READINESS.",
-  "INTEGRITY PROTECTS THE SYSTEM.",
-  "RECOVERY RESTORES THE SYSTEM.",
-  "FRESHNESS PRESERVES THE SYSTEM.",
-  "THE GOAL IS TO WIN THE DAY. AND TO ARRIVE TOMORROW READY AGAIN.",
-  "CONSIDER STOPPING AT -250.",
-  "LOOK FOR CHOP AND MANIPULATION.",
-  "DON'T RELY ON STOPS. STAY ALERT.",
-  "SESSION WILL END QUICKLY. BE MINDFUL.",
-  "MANAGE MOODS OUTSIDE OF TRADING. ESPECIALLY ON WEEKENDS.",
+  "INTEGRITY PROTECTS THE SYSTEM. RECOVERY RESTORES IT.",
+  "THE GOAL IS NOT PNL. THE GOAL IS TO ARRIVE TOMORROW BETTER THAN TODAY.",
+  "EVERY DESTRUCTIVE BEHAVIOR HAS A CAUSE. EVERY CAUSE CAN BE INTERRUPTED.",
+  "SYSTEMS BEAT WILLPOWER. DESIGN THE ENVIRONMENT. TRUST THE STRUCTURE.",
+  "A HIGH-LEVERAGE RULE PREVENTS MULTIPLE MISTAKES SIMULTANEOUSLY.",
+  "CONSIDER STOPPING AT -250. LOSSES DON'T MATTER. REPS DO.",
+  "LOOK FOR CHOP AND MANIPULATION. PATIENCE IS NOT PASSIVE.",
+  "OBSERVE. DECIDE. EXIT. IN THAT ORDER. ALWAYS.",
+  "THE MARKET CANNOT GET RID OF YOU. THAT IS YOUR EDGE.",
+  "WHAT IS HAPPENING IS NOT WHAT IS GOING TO HAPPEN.",
   "YOU ARE ALL THAT STANDS BETWEEN A PROFITABLE ACCOUNT AND THE MARKET.",
   "WHAT IF IT WORKS OUT?",
+  "PRACTICE SITTING AND DOING NOTHING. STILLNESS IS A SKILL.",
+  "LOSSES ARE TUITION. DISCIPLINE WAS ACHIEVED. THE SYSTEM HELD.",
   "I AM DETERMINED TO HAVE A GOOD DAY REGARDLESS OF WHAT HAPPENS.",
-  "BE GRATEFUL. SHOW REVERENCE FOR EVERY COMBINE."
+  "BE GRATEFUL. SHOW REVERENCE FOR EVERY COMBINE.",
+  "I AM A HUNTER. I AM A SNIPER. I WILL WAIT FOR AS LONG AS IT TAKES.",
+  "PROCESS OVER OUTCOME. REPS OVER RESULTS. ROUTINE OVER IMPULSE."
 ];
 const manualNotes=[
   ["LOCK RISK SETTINGS","WIN: LOCKED BEFORE CHARTS. FAIL: RISK LEFT OPEN."],
@@ -811,10 +966,40 @@ const powerQuotes=[
     text:"Take the position that you are to some degree wrong. Then aspire to be less wrong.",
     author:"— Elon Musk",
      weight:15
+  },
+  {
+    text:"You don't have to be perfect. You just have to be slightly better than yesterday.",
+    author:"— Ben OS v0.02",
+    weight:25
+  },
+  {
+    text:"The process is the product. Protect the process above everything else.",
+    author:"— Ben OS v0.02",
+    weight:25
+  },
+  {
+    text:"I feel like an annoyance. And the market can't get rid of me.",
+    author:"— Ben, 6.25.26 Journal",
+    weight:30
+  },
+  {
+    text:"For four hours of straight trading, I was break even until the end. I never traded like this before in my life.",
+    author:"— Ben, 6.25.26 Journal",
+    weight:25
+  },
+  {
+    text:"Despite the very familiar ending, I see something happening here.",
+    author:"— Ben, 6.25.26 Journal",
+    weight:25
+  },
+  {
+    text:"This is starting to get kinda fun.",
+    author:"— Ben, 6.25.26 Journal",
+    weight:20
   }
 ];
 
-const APP_VERSION="8.3.0";
+const APP_VERSION="8.4.0";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -1976,7 +2161,7 @@ function isCleanSprite(type){
   return type==="angel" || type==="red" || type==="orange" || type==="yellow" || type==="green" || type==="blue" || type==="purple" || type==="black" || type==="brown";
 }
 function getPetClass(type){ return isCleanSprite(type) ? "pet-img clean-img" : "pet-img"; }
-function streakHTML(){ return "<div class='streak-counter'>"+state.streak+"</div>"; }
+function streakHTML(){ return "<div class='streak-counter"+(state.streak>0?" active":"")+"'>"+state.streak+"</div>"; }
 function achievementHTML(){ return "<div class='achievement-banner' id='achievementBanner'></div>"; }
 function santaHatHTML(type){
   const month=new Date().getMonth();
@@ -2499,20 +2684,20 @@ let status="REST DAY";
     petType=state.finalForm;
     status=state.finalForm==="angel" ? "PERFECT WEEK" : "WEEK FORM";
   }else if(todayIndex>=0){
-    status="STEADY";
+    status="STANDBY";
 if(state.dayMode==="light"){
   status="LIGHT SESSION";
 }
 if(state.statuses[todayIndex]==="complete"){
-  status="DAY SEALED CLEAN";
+  status="PROCESS HELD";
   petType="king";
 }
 if(state.statuses[todayIndex]==="recovery"){
-  status="RECOVERY DAY";
+  status="RECOVERY ACTIVE";
   petType="knight";
 }
 if(state.statuses[todayIndex]==="failed"){
-  status="INTEGRITY DAMAGED";
+  status="SYSTEM DEGRADED";
   petType="rook";
 }
   }
@@ -2570,7 +2755,7 @@ function showCheck(restoreScroll=null){
     html+="</div>";
   }
 html+="<div class='section-label'>GROWTH</div>";
-html+="<div class='small-note'>TEMPER THE BLADE</div>";
+html+="<div class='small-note'>BUILD THE SYSTEM. TEMPER THE BLADE.</div>";
 
 for(let i=0;i<growthVows.length;i++){
   html+="<div class='rule'>";
@@ -2709,7 +2894,7 @@ function showRecoveryCheck(restoreScroll=null){
   html+="<div class='panel'>";
   html+="<div class='panel-title'>RECOVERY DAY</div>";
   html+="<div class='scroll' id='recoveryScroll'>";
-  html+="<div class='small-note'>RECOVERY IS TRAINING. RESTORE READINESS.</div>";
+  html+="<div class='small-note'>RECOVERY IS NOT A LOST DAY. RECOVERY BUILDS TOMORROW.</div>";
 
   html+="<div class='section-label'>VOWS</div>";
   for(let i=0;i<recoveryVows.length;i++){
@@ -2802,7 +2987,7 @@ function showAfterActionReport(restoreScroll=null){
   html+="<div class='panel'>";
   html+="<div class='panel-title'>AFTER ACTION REPORT</div>";
   html+="<div class='scroll' id='actionScroll'>";
-  html+="<div class='small-note'>LOSS IS NOT DAMAGE. RECORD THE LESSON.</div>";
+  html+="<div class='small-note'>A LOSS IS DATA. RECORD THE LESSON. INSTALL THE PATCH.</div>";
 
   html+="<div class='section-label'>MARKET CONDITION</div>";
   for(let i=0;i<actionMarketConditions.length;i++){
@@ -2992,7 +3177,7 @@ function showDamageProtocol(restoreScroll=null){
   html+="<div class='panel'>";
   html+="<div class='panel-title'>DAMAGE PROTOCOL</div>";
   html+="<div class='scroll' id='damageProtocolScroll'>";
-  html+="<div class='small-note'>STOP ESCALATION. REPAIR THE SYSTEM.</div>";
+  html+="<div class='small-note'>STOP ESCALATION. ISOLATE THE BUG. REPAIR THE SYSTEM.</div>";
 
   for(let i=0;i<damageProtocolVows.length;i++){
     html+="<div class='rule'>";
@@ -3164,11 +3349,11 @@ function showTrain(playSound=true,restoreScroll=null){
 
   let html="";
   html+="<div class='panel'>";
-  html+="<div class='panel-title'>TRAINING GROUNDS</div>";
+  html+="<div class='panel-title'>DRILL LAB</div>";
   html+="<div class='scroll' id='trainingScroll'>";
 
   html+="<div class='training-stat'>";
-html+="<div>TODAY'S JOURNEY</div>";
+html+="<div>TODAY'S REPS</div>";
 html+=trainingTrolleyHTML();
 html+="<div class='training-bar'>"+trainingProgressBar()+"</div>";
 const todayTotal=
@@ -3288,7 +3473,7 @@ function showTrainingGuide(){
  html+="<div class='panel-title'>TRAINING FIELD MANUAL</div>";
  html+="<div class='scroll'>";
 
- html+="<div class='small-note'>THE OBJECTIVE IS NOT PNL. THE OBJECTIVE IS AGENCY.</div>";
+ html+="<div class='small-note'>REPS BUILD NEURAL PATHWAYS. PNL IS NOT THE OBJECTIVE.</div>";
 
  html+="<div class='section-label'>EXIT STARS</div>";
  html+="<div class='note'>MISSION: EARN 10 EXIT STARS.</div>";
@@ -3306,8 +3491,8 @@ function showTrainingGuide(){
  html+="<div class='note'>DOES NOT COUNT: HARD STOP, HOPING, AVERAGING DOWN, OR WAITING FOR RESCUE.</div>";
 
  html+="<div class='section-label'>THE PRINCIPLE</div>";
- html+="<div class='note'>OBSERVE → DECIDE → EXIT.</div>";
- html+="<div class='note'>A PERFECT TRAINING DAY IS NOT GREEN PNL. IT IS COMPLETING ALL THREE DRILLS WITH INTENTION.</div>";
+ html+="<div class='note'>OBSERVE → DECIDE → EXIT. IN THAT ORDER. ALWAYS.</div>";
+ html+="<div class='note'>A PERFECT TRAINING DAY IS NOT GREEN PNL. IT IS COMPLETING ALL THREE DRILLS WITH INTENTION. THE REP IS THE WIN.</div>";
 
  html+="</div>";
  html+="<div class='panel-buttons'>";
@@ -3422,8 +3607,8 @@ function showTrainingComplete(){
     "<div class='panel-title'>TRAINING COMPLETE</div>"+
     "<div class='scroll' style='display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;'>"+
     "<div class='training-stat' style='border-bottom:none;'>"+
-    "<div style='font-size:25px;margin-bottom:14px;'>THE TROLLEY HAS</div>"+
-    "<div style='font-size:25px;margin-bottom:14px;'>REACHED THE CASTLE</div>"+
+    "<div style='font-size:25px;margin-bottom:14px;'>REPS COMPLETE.</div>"+
+    "<div style='font-size:25px;margin-bottom:14px;'>THE TROLLEY HAS ARRIVED.</div>"+
     "<div style='font-size:42px;margin-bottom:12px;'>🚋 → 🏰</div>"+
     "<div class='training-big'>"+getTrainingRankName()+"</div>"+
     "</div>"+
@@ -3493,7 +3678,7 @@ function showMorningGate(){
   html+="<button class='mini-btn' onclick='chooseRecoveryDay()'>RECOVERY DAY</button>";
   html+="<button class='mini-btn' onclick='chooseDamageDay()'>DAMAGE</button>";
 
-  html+="<div class='small-note'>COMPROMISED MINDS DO NOT GET MARKET ACCESS.</div>";
+  html+="<div class='small-note'>COMPROMISED SYSTEMS DO NOT GET MARKET ACCESS.</div>";
 
   html+="</div>";
   html+="</div>";
@@ -3544,6 +3729,7 @@ function showCode(){
     "<button class='mini-btn' onclick='showCoreCode()'>CORE CODE</button>"+
     "<button class='mini-btn' onclick='showManualCode()'>INSTRUCTION MANUAL</button>"+
     "<button class='mini-btn' onclick='showMorningGateCode()'>MORNING GATE</button>"+
+    "<button class='mini-btn' onclick='showMantrasCode()'>MANTRAS</button>"+
     "<button class='mini-btn' onclick='showSaveCode()'>SAVE DATA</button>"+
     "</div>"+
     "<div class='panel-buttons'>"+
@@ -3595,6 +3781,38 @@ function showMorningGateCode(){
     html+="<div class='note'>";
     html+="<div style='font-size:22px;'>"+(i+1)+". "+gateQuestions[i]+"</div>";
     html+="</div>";
+  }
+
+  html+="</div><div class='panel-buttons'>";
+  html+="<button class='mini-btn' onclick='showCode()'>BACK</button>";
+  html+="</div></div>";
+
+  document.getElementById("playArea").innerHTML=html;
+}
+
+function showMantrasCode(){
+  document.getElementById("statusBar").innerHTML="MANTRAS";
+  const mantras=[
+    "I AM A HUNTER.",
+    "I AM A SNIPER.",
+    "I WILL WAIT FOR AS LONG AS IT TAKES.",
+    "ONE CONTRACT MAX.",
+    "LOSSES DON'T MATTER. REPS DO.",
+    "OBSERVE. DECIDE. EXIT.",
+    "PROCESS OVER OUTCOME.",
+    "I FEEL LIKE AN ANNOYANCE. AND THE MARKET CAN'T GET RID OF ME.",
+    "THIS IS ENDURANCE TRAINING.",
+    "THE THING I BROKE TODAY WAS IN MY CONTROL. THIS CAN BE FIXED.",
+    "I LIKE THAT MY PNL IS NEGATIVE. IT GIVES ME SOMETHING TO FIGHT FOR.",
+    "LANDING THE PLANE.",
+    "DIVORCE SUCCESS FROM YOUR MIND. FOCUS ON THE ENTRY."
+  ];
+
+  let html="<div class='panel'><div class='panel-title'>MANTRAS</div><div class='scroll'>";
+  html+="<div class='small-note'>REPEAT UNTIL 30 SECONDS IS UP.</div>";
+
+  for(let i=0;i<mantras.length;i++){
+    html+="<div class='note' style='font-size:23px;line-height:1.1;'>"+(i+1)+". "+mantras[i]+"</div>";
   }
 
   html+="</div><div class='panel-buttons'>";
@@ -3741,11 +3959,11 @@ function getReadinessWeather(score){
 }
 
 function getReadinessMessage(weather){
-  if(weather==="CLEAR") return "TODAY IS FAVORABLE FOR DECISIVE ACTION.";
+  if(weather==="CLEAR") return "SYSTEM IS STABLE. EXECUTE THE PROCESS.";
   if(weather==="FAIR") return "TRADE WITH RESPECT. DO NOT FORCE.";
   if(weather==="CLOUDY") return "LIGHT SESSION ADVISED. MOVE SLOWLY.";
-  if(weather==="FOGGY") return "LIGHT SESSION ADVISED.";
-  return "RECOVERY ADVISED. DO NOT TRADE.";
+  if(weather==="FOGGY") return "LIGHT SESSION ADVISED. ONE TRADE AT A TIME.";
+  return "RECOVERY ASSIGNED. DO. NOT. TRADE.";
 }
 function showGateReport(status, readiness, weather, assignment, message){
   document.getElementById("screen").className="screen boot-dark";
@@ -3754,7 +3972,7 @@ function showGateReport(status, readiness, weather, assignment, message){
   document.getElementById("playArea").innerHTML=
     "<div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#e9ecd8;background:#111;font-size:28px;line-height:1.05;'>"+
     "<div>"+
-    "SUBJECT: TRADER"+
+    "SUBJECT: BEN OS"+
     "<br><br>"+
     "STATUS: "+status+
     "<br><br>"+
@@ -4150,7 +4368,7 @@ if(state.dayMode==="trade" || state.dayMode==="light"){
   }
 
   let sealText="DAY SEALED";
-  let resultText=passed ? "INTEGRITY PRESERVED" : "INTEGRITY DAMAGED";
+  let resultText=passed ? "PROCESS HELD" : "SYSTEM DEGRADED";
 
   if(state.dayMode==="recovery"){
     sealText="RECOVERY SEALED";
@@ -4164,7 +4382,7 @@ if(state.dayMode==="damage" && state.damageProtocolActive){
 
   if(shouldPlayFirework){
     sealText="PERFECT WEEK!";
-    resultText="INTEGRITY PRESERVED";
+    resultText="PROCESS HELD";
   }else if(todayIndex===5 && weeklyForm){
     sealText="WEEK FORM";
     resultText=weeklyVowPercent()+"% VOWS KEPT";
@@ -4367,6 +4585,39 @@ buildSounds();
 ensureAchievementArchive();
 renderPowerQuote();
 renderDays();
+
+// ── RIPPLE EFFECT ON MINI BUTTONS ─────────────────────────────────────
+document.addEventListener("click",function(e){
+  const btn=e.target.closest(".mini-btn,.control-wrap button");
+  if(!btn) return;
+  const rect=btn.getBoundingClientRect();
+  const el=document.createElement("span");
+  el.className="ripple-el";
+  el.style.left=(e.clientX-rect.left-20)+"px";
+  el.style.top=(e.clientY-rect.top-20)+"px";
+  btn.appendChild(el);
+  setTimeout(()=>el.remove(),520);
+});
+
+// ── STATUS-BASED SCREEN GLOW ──────────────────────────────────────────
+function updateScreenGlow(){
+  const scr=document.getElementById("screen");
+  if(!scr) return;
+  const s=state.statuses && todayIndex>=0 ? state.statuses[todayIndex] : null;
+  if(s==="failed"){
+    scr.classList.add("glow-fail");
+  }else{
+    scr.classList.remove("glow-fail");
+  }
+}
+
+// Patch showMain to also update glow
+const _origShowMain=showMain;
+showMain=function(fromBoot=false){
+  _origShowMain(fromBoot);
+  updateScreenGlow();
+};
+updateScreenGlow();
 </script>
 </body>
 </html>
