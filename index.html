@@ -536,7 +536,19 @@ const weekdayVows=[
   "JOURNAL EVERY TRADE WITH FORMAT",
   "MANTRA AFTER EVERY TRADE — NO EXCEPTIONS",
   "IF STOP HIT ON FIRST ACCOUNT, SESSION OVER",
-  "EXPORT TRADES AT SESSION END"
+  "EXPORT TRADES AT SESSION END",
+  "STOP AT DAILY LOSS LIMIT",
+  "STOP-AND-RESET AFTER ONE BROKEN RULE",
+  "WAIT FOR CANDLE ENTRY WINDOW",
+  "NO HIGH-NOISE HOURS",
+  "COOLDOWN AFTER LOSS BEFORE RE-ENTRY",
+  "START STOPWATCH BEFORE FIRST TRADE",
+  "END SESSION AT FATIGUE TIMER",
+  "DO NOT ADD TO A LOSING TRADE",
+  "NO TRADING WHILE UNFIT",
+  "PAUSE / RESET AFTER EVERY WIN",
+  "NO HOLIDAY OR LOW-LIQUIDITY TRADING",
+  "SIZE BACK DOWN TO 1 AFTER A WIN"
 ];
 const sundayVows=[
   "LOCK BOTH ACCOUNTS"
@@ -578,6 +590,31 @@ const gateQuestions=[
 const GATE_LIGHT_LIMIT=5;
 const GATE_FAIL_LIMIT=8;
 const VOW_STREAK_TARGET=62;
+const vowSolutions={
+  "MAX 1 CONTRACT AT ALL TIMES":"SOLUTION: SAY CONTRACT COUNT OUT LOUD BEFORE ENTRY. IF IT IS NOT 1, CLOSE PLATFORM FOR 60 SECONDS.",
+  "STOP AT DAILY LOSS LIMIT":"SOLUTION: HARD DAILY STOP IS FINAL. PLATFORM ENFORCES IT; YOU DO NOT NEGOTIATE.",
+  "MANTRA AFTER EVERY TRADE — NO EXCEPTIONS":"SOLUTION: AFTER A LOSS, STAND UP FOR 60 SECONDS BEFORE TOUCHING PLATFORM AGAIN.",
+  "DON'T TRADE OUTSIDE ROUTINE":"SOLUTION: IF NOT IN ROUTINE LOCATION / WINDOW, PLATFORM STAYS CLOSED.",
+  "STOP-AND-RESET AFTER ONE BROKEN RULE":"SOLUTION: READ RESET CARD VERBATIM BEFORE ANY NEXT ACTION.",
+  "WAIT FOR CANDLE ENTRY WINDOW":"SOLUTION: USE COUNTDOWN TIMER. NO ENTRY UNTIL WAIT WINDOW ENDS.",
+  "NO HIGH-NOISE HOURS":"SOLUTION: BLOCK OPEN / LUNCH NOISE HOURS. PLATFORM AWAY DURING BLOCKED TIME.",
+  "COOLDOWN AFTER LOSS BEFORE RE-ENTRY":"SOLUTION: START 5-MIN TIMER. NO RE-ENTRY UNTIL IT EXPIRES.",
+  "START STOPWATCH BEFORE FIRST TRADE":"SOLUTION: STOPWATCH IS FIRST MOTION OF SESSION.",
+  "END SESSION AT FATIGUE TIMER":"SOLUTION: SESSION TIMER ALARM MEANS LOG OFF REGARDLESS OF P&L.",
+  "DO NOT ADD TO A LOSING TRADE":"SOLUTION: WHEN UNDERWATER, HANDS OFF PHONE / KEYBOARD FOR 30 SECONDS.",
+  "NO TRADING WHILE UNFIT":"SOLUTION: PRE-MARKET CHECKLIST. IF UNFIT, LOG A SAT-OUT WIN.",
+  "PAUSE / RESET AFTER EVERY WIN":"SOLUTION: WIN ALSO TRIGGERS RESET CARD. DO NOT LET EUPHORIA DRIVE NEXT TRADE.",
+  "NO HOLIDAY OR LOW-LIQUIDITY TRADING":"SOLUTION: CHECK CALENDAR THE DAY BEFORE. KNOWN HOLIDAY = NO TRADE.",
+  "SIZE BACK DOWN TO 1 AFTER A WIN":"SOLUTION: AFTER ANY WIN, SAY OR WRITE 'BACK TO 1' BEFORE NEXT ENTRY."
+};
+function vowStarHTML(vowName){
+  return state.vowMilestones && state.vowMilestones[vowName] ? " ⭐️" : "";
+}
+function vowSolutionHTML(vowName){
+  return vowSolutions[vowName]
+    ? "<div class='vow-tally'>"+vowSolutions[vowName]+"</div>"
+    : "";
+}
 const lightSessionVows=[
   "MAX SIZE 1",
   "ONE ACCOUNT ONLY",
@@ -708,6 +745,18 @@ const manualNotes=[
   ["EXPORT TRADES AT SESSION END","WIN: TRADES EXPORTED BEFORE CLOSING PLATFORM. FAIL: FORGOTTEN OR DONE LATE."],
   ["PILOT CALLOUT — LAND THE PLANE","WIN: SAID IT OUT LOUD AND FLATTENED. FAIL: IGNORED THE SIGNAL."],
   ["SECOND DRAWDOWN RULE","WIN: STOPPED WHEN TRIGGERED. FAIL: RECOVERED AND FELL TO SAME LEVEL TWICE AND CONTINUED."],
+  ["STOP AT DAILY LOSS LIMIT","WIN: STOPPED WHEN DAILY LOSS LIMIT WAS REACHED. FAIL: KEPT TRADING PAST LIMIT. SOLUTION: HARD DAILY STOP IS FINAL."],
+  ["STOP-AND-RESET AFTER ONE BROKEN RULE","WIN: RESET PROTOCOL EXECUTED AFTER FIRST BREAK. FAIL: ONE BREAK BECAME SPIRAL. SOLUTION: READ RESET CARD BEFORE NEXT ACTION."],
+  ["WAIT FOR CANDLE ENTRY WINDOW","WIN: ENTRY WAIT WINDOW RESPECTED. FAIL: ENTERED TOO CLOSE TO CANDLE OPEN. SOLUTION: COUNTDOWN TIMER FIRST."],
+  ["NO HIGH-NOISE HOURS","WIN: DID NOT TRADE BLOCKED OPEN / LUNCH NOISE HOURS. FAIL: TRADED DURING HIGH-NOISE WINDOW. SOLUTION: CALENDAR BLOCK."],
+  ["COOLDOWN AFTER LOSS BEFORE RE-ENTRY","WIN: TIMER EXPIRED BEFORE RE-ENTRY. FAIL: IMMEDIATE REVENGE RE-ENTRY. SOLUTION: 5-MIN TIMER."],
+  ["START STOPWATCH BEFORE FIRST TRADE","WIN: STOPWATCH STARTED BEFORE FIRST TRADE. FAIL: TRADED WITHOUT TIMER. SOLUTION: STOPWATCH IS FIRST MOTION."],
+  ["END SESSION AT FATIGUE TIMER","WIN: SESSION ENDED WHEN TIMER / FATIGUE LIMIT HIT. FAIL: EXTENDED SESSION WHILE FATIGUED. SOLUTION: ALARM MEANS LOG OFF."],
+  ["DO NOT ADD TO A LOSING TRADE","WIN: NO CONTRACTS ADDED WHILE UNDERWATER. FAIL: ADDED TO LOSER. SOLUTION: HANDS OFF FOR 30 SECONDS."],
+  ["NO TRADING WHILE UNFIT","WIN: SAT OUT WHEN UNFIT. FAIL: TRADED AFTER RECOGNIZING COMPROMISED STATE. SOLUTION: UNFIT DAY COUNTS AS A SAT-OUT WIN."],
+  ["PAUSE / RESET AFTER EVERY WIN","WIN: RESET AFTER WIN COMPLETED. FAIL: WIN LED DIRECTLY INTO NEXT IMPULSE. SOLUTION: RESET CARD AFTER WINS TOO."],
+  ["NO HOLIDAY OR LOW-LIQUIDITY TRADING","WIN: KNOWN HOLIDAY / LOW-LIQUIDITY SESSION AVOIDED. FAIL: TRADED IT ANYWAY. SOLUTION: CHECK CALENDAR DAY BEFORE."],
+  ["SIZE BACK DOWN TO 1 AFTER A WIN","WIN: NEXT TRADE RETURNED TO 1 CONTRACT. FAIL: STAYED SIZED UP AFTER WIN. SOLUTION: SAY 'BACK TO 1' BEFORE NEXT ENTRY."],
   ["DRILLS","WIN: PRACTICE DONE. FAIL: SKIPPED."],
   ["JOURNAL REVIEW","WIN: REVIEWED PRIOR JOURNALS FOR PATTERNS OR LESSONS. FAIL: NO REVIEW."],
   ["FILM STUDY","WIN: REVIEWED SCREEN RECORDING FOR LESSONS OR RULE VIOLATIONS. FAIL: NO REVIEW."],
@@ -1969,18 +2018,6 @@ damageProtocolVows:Array.from({length:6},()=>Array(damageProtocolVows.length).fi
   };
 }
 
-function resizeVowRow(row,targetLen){
-  let out=Array.isArray(row) ? row.slice(0,targetLen) : [];
-  while(out.length<targetLen) out.push(false);
-  return out;
-}
-function resizeVowGrid(grid,targetLen,rows=6){
-  let out=[];
-  for(let i=0;i<rows;i++){
-    out.push(resizeVowRow(grid && grid[i] ? grid[i] : [],targetLen));
-  }
-  return out;
-}
 function loadState(){
   let saved=localStorage.getItem("kaizenKnightV5");
   if(!saved) return freshState();
@@ -2044,15 +2081,34 @@ newState.trainingPromotedToday=typeof parsed.trainingPromotedToday==="boolean"
 
 return newState;
     }
-    // Vow lists can grow/shrink between app versions. Resize instead of
-    // discarding the whole save, so old progress survives a vow edit.
-    parsed.sundayVows=resizeVowRow(parsed.sundayVows,sundayVows.length);
-    parsed.growthVows=resizeVowGrid(parsed.growthVows,growthVows.length);
-    parsed.weekdayVows=resizeVowGrid(parsed.weekdayVows,weekdayVows.length);
-    parsed.damage=resizeVowGrid(parsed.damage,damageStates.length);
-    parsed.lightSessionVows=resizeVowGrid(parsed.lightSessionVows,lightSessionVows.length);
-    parsed.recoveryVows=resizeVowGrid(parsed.recoveryVows,recoveryVows.length);
-    parsed.recoveryDamage=resizeVowGrid(parsed.recoveryDamage,recoveryDamageStates.length);
+    if(!parsed.sundayVows || parsed.sundayVows.length!==sundayVows.length) return freshState();
+if(!parsed.growthVows || parsed.growthVows.length!==6 || parsed.growthVows[0].length!==growthVows.length){
+  parsed.growthVows=Array.from({length:6},()=>Array(growthVows.length).fill(false));
+}
+    if(!parsed.weekdayVows || parsed.weekdayVows.length!==6){
+      parsed.weekdayVows=Array.from({length:6},()=>Array(weekdayVows.length).fill(false));
+    }else{
+      for(let d=1;d<=5;d++){
+        if(!Array.isArray(parsed.weekdayVows[d])) parsed.weekdayVows[d]=[];
+        while(parsed.weekdayVows[d].length<weekdayVows.length){
+          parsed.weekdayVows[d].push(parsed.statuses && parsed.statuses[d]==="complete");
+        }
+        if(parsed.weekdayVows[d].length>weekdayVows.length){
+          parsed.weekdayVows[d]=parsed.weekdayVows[d].slice(0,weekdayVows.length);
+        }
+      }
+    }
+    if(!parsed.damage || parsed.damage[0].length!==damageStates.length) return freshState();
+if(!parsed.lightSessionVows || parsed.lightSessionVows.length!==6 || parsed.lightSessionVows[0].length!==lightSessionVows.length){
+  parsed.lightSessionVows=Array.from({length:6},()=>Array(lightSessionVows.length).fill(false));
+}
+if(!parsed.recoveryVows || parsed.recoveryVows.length!==6 || parsed.recoveryVows[0].length!==recoveryVows.length){
+  parsed.recoveryVows=Array.from({length:6},()=>Array(recoveryVows.length).fill(false));
+}
+
+if(!parsed.recoveryDamage || parsed.recoveryDamage.length!==6 || parsed.recoveryDamage[0].length!==recoveryDamageStates.length){
+  parsed.recoveryDamage=Array.from({length:6},()=>Array(recoveryDamageStates.length).fill(false));
+}
     if(typeof parsed.streak!=="number") parsed.streak=cleanCountFromStatuses(parsed.statuses);
     if(typeof parsed.bestStreak!=="number") parsed.bestStreak=parsed.streak;
 if(!parsed.vowTallies) parsed.vowTallies={};
@@ -2133,7 +2189,9 @@ if(!parsed.gateAnswers || parsed.gateAnswers.length!==gateQuestions.length){
 }
 if(typeof parsed.readinessScore==="undefined") parsed.readinessScore=null;
 if(typeof parsed.readinessWeather==="undefined") parsed.readinessWeather=null;
-parsed.damageProtocolVows=resizeVowGrid(parsed.damageProtocolVows,damageProtocolVows.length);
+if(!parsed.damageProtocolVows || parsed.damageProtocolVows.length!==6 || parsed.damageProtocolVows[0].length!==damageProtocolVows.length){
+  parsed.damageProtocolVows=Array.from({length:6},()=>Array(damageProtocolVows.length).fill(false));
+}
 
 if(!parsed.achievements) parsed.achievements={};
    if(!parsed.records) parsed.records=[];
@@ -3006,7 +3064,10 @@ function showCheck(restoreScroll=null){
     const tally=state.vowTallies[todaysVows[i]] || 0;
     html+="<div class='rule'>";
     html+="<div class='box "+(vowState[i]?"checked":"")+"' onclick='toggleVow("+i+")'></div>";
-    html+="<div>"+todaysVows[i]+"<div class='vow-tally'>RULE STREAK: "+tally+" / "+VOW_STREAK_TARGET+" DAYS</div></div>";
+    html+="<div>"+todaysVows[i]+vowStarHTML(todaysVows[i])+
+      "<div class='vow-tally'>RULE STREAK: "+tally+" / "+VOW_STREAK_TARGET+" DAYS</div>"+
+      vowSolutionHTML(todaysVows[i])+
+      "</div>";
     html+="</div>";
   }
 html+="<div class='section-label'>GROWTH</div>";
@@ -4141,16 +4202,26 @@ function showRules(){
   document.getElementById("statusBar").innerHTML="RULES";
 
   const rules=[
-    "1 CONTRACT MAXIMUM",
-    "SECOND DRAWDOWN RULE — IF YOU RECOVER AND FALL BACK TO SAME LOSS LEVEL TWICE, SESSION IS OVER",
-    "NO HARD STOPS — STAY ALERT. MANUAL EXIT IS THE SKILL.",
-    "MANTRA AFTER EVERY TRADE. NO EXCEPTIONS.",
-    "STOP WATCH AFTER EVERY TRADE. NO EXCEPTIONS.",
-    "PILOT CALLOUT — IF TRADE GIVES YOU A FEELING: SAY 'LANDING THE PLANE' AND FLATTEN.",
-    "DON'T TRADE LARGER THAN YOUR ABILITY TO MANUALLY EXIT.",
+    "62-DAY CORE VOW SYSTEM: EACH BINARY VOW EARNS A STAR AT 62 CLEAN LOCKED DAYS.",
+    "MAX 1 CONTRACT AT ALL TIMES.",
+    "STOP AT DAILY LOSS LIMIT.",
+    "MANTRA / PAUSE AFTER EVERY TRADE. NO EXCEPTIONS.",
+    "DON'T TRADE OUTSIDE ROUTINE.",
+    "STOP-AND-RESET AFTER ONE BROKEN RULE.",
+    "WAIT FOR CANDLE ENTRY WINDOW.",
+    "NO HIGH-NOISE HOURS.",
+    "COOLDOWN AFTER LOSS BEFORE RE-ENTRY.",
+    "START STOPWATCH BEFORE FIRST TRADE.",
+    "END SESSION AT FATIGUE TIMER.",
+    "DO NOT ADD TO A LOSING TRADE.",
+    "NO TRADING WHILE UNFIT.",
+    "PAUSE / RESET AFTER EVERY WIN.",
+    "NO HOLIDAY OR LOW-LIQUIDITY TRADING.",
+    "SIZE BACK DOWN TO 1 AFTER A WIN.",
     "DELETE VIDEOS BEFORE SESSION. CHECK RECENTLY DELETED.",
     "LOCK RISK SETTINGS ON BOTH COMBINES BEFORE CHARTS OPEN.",
-    "RECORD SESSION BEFORE FIRST TRADE."
+    "RECORD SESSION BEFORE FIRST TRADE.",
+    "EXPORT TRADES AT SESSION END."
   ];
 
   let html="<div class='panel'>";
@@ -4432,6 +4503,20 @@ function showGallery(mode="trophies"){
     html+="<div class='panel'><div class='scroll'>";
     html+="<div class='record-line'>REST THIS WEEK: "+recoveryCountThisWeek()+"</div>";
     html+="<div class='record-line'>REST THIS MONTH: "+recoveryCountThisMonth()+"</div>";
+
+    html+="<div class='section-label'>62-DAY VOW STARS</div>";
+    let starVows=getVaultVows();
+    let anyStar=false;
+    for(let i=0;i<starVows.length;i++){
+      let vow=starVows[i];
+      if(state.vowMilestones && state.vowMilestones[vow]){
+        anyStar=true;
+        html+="<div class='record-line'>"+vow+" ⭐️ "+state.vowMilestones[vow]+"</div>";
+      }
+    }
+    if(!anyStar){
+      html+="<div class='small-note'>NO 62-DAY VOW STARS YET</div>";
+    }
 
     if(!state.records || state.records.length<=0){
       html+="<div class='small-note' style='margin-top:14px;'>NO WEEK RECORDS YET</div>";
@@ -4923,27 +5008,7 @@ saveState();
 
     document.getElementById("statusBar").innerHTML="SAVE RESTORED";
 
-    setTimeout(()=>{
-      todayIndex=getTradingDayIndex();
-      weekKey=getWeekKey();
-      state.weekKey=weekKey;
-      state.sundayVows=resizeVowRow(state.sundayVows,sundayVows.length);
-      state.growthVows=resizeVowGrid(state.growthVows,growthVows.length);
-      state.weekdayVows=resizeVowGrid(state.weekdayVows,weekdayVows.length);
-      state.damage=resizeVowGrid(state.damage,damageStates.length);
-      state.lightSessionVows=resizeVowGrid(state.lightSessionVows,lightSessionVows.length);
-      state.recoveryVows=resizeVowGrid(state.recoveryVows,recoveryVows.length);
-      state.recoveryDamage=resizeVowGrid(state.recoveryDamage,recoveryDamageStates.length);
-      state.damageProtocolVows=resizeVowGrid(state.damageProtocolVows,damageProtocolVows.length);
-      ensureDailyModeFresh();
-      resetTrainingForNewDay();
-      ensureVowTallies();
-      ensureCombineCounterFresh();
-      state.crackActive=anyDamageActive();
-      renderPowerQuote();
-      saveState();
-      showMain();
-    },450);
+    setTimeout(()=>{ location.reload(); },450);
 
   }catch(e){
 
