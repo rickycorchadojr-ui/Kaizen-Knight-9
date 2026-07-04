@@ -1969,6 +1969,18 @@ damageProtocolVows:Array.from({length:6},()=>Array(damageProtocolVows.length).fi
   };
 }
 
+function resizeVowRow(row,targetLen){
+  let out=Array.isArray(row) ? row.slice(0,targetLen) : [];
+  while(out.length<targetLen) out.push(false);
+  return out;
+}
+function resizeVowGrid(grid,targetLen,rows=6){
+  let out=[];
+  for(let i=0;i<rows;i++){
+    out.push(resizeVowRow(grid && grid[i] ? grid[i] : [],targetLen));
+  }
+  return out;
+}
 function loadState(){
   let saved=localStorage.getItem("kaizenKnightV5");
   if(!saved) return freshState();
@@ -2032,22 +2044,15 @@ newState.trainingPromotedToday=typeof parsed.trainingPromotedToday==="boolean"
 
 return newState;
     }
-    if(!parsed.sundayVows || parsed.sundayVows.length!==sundayVows.length) return freshState();
-if(!parsed.growthVows || parsed.growthVows.length!==6 || parsed.growthVows[0].length!==growthVows.length){
-  parsed.growthVows=Array.from({length:6},()=>Array(growthVows.length).fill(false));
-}
-    if(!parsed.weekdayVows || parsed.weekdayVows[1].length!==weekdayVows.length) return freshState();
-    if(!parsed.damage || parsed.damage[0].length!==damageStates.length) return freshState();
-if(!parsed.lightSessionVows || parsed.lightSessionVows.length!==6 || parsed.lightSessionVows[0].length!==lightSessionVows.length){
-  parsed.lightSessionVows=Array.from({length:6},()=>Array(lightSessionVows.length).fill(false));
-}
-if(!parsed.recoveryVows || parsed.recoveryVows.length!==6 || parsed.recoveryVows[0].length!==recoveryVows.length){
-  parsed.recoveryVows=Array.from({length:6},()=>Array(recoveryVows.length).fill(false));
-}
-
-if(!parsed.recoveryDamage || parsed.recoveryDamage.length!==6 || parsed.recoveryDamage[0].length!==recoveryDamageStates.length){
-  parsed.recoveryDamage=Array.from({length:6},()=>Array(recoveryDamageStates.length).fill(false));
-}
+    // Vow lists can grow/shrink between app versions. Resize instead of
+    // discarding the whole save, so old progress survives a vow edit.
+    parsed.sundayVows=resizeVowRow(parsed.sundayVows,sundayVows.length);
+    parsed.growthVows=resizeVowGrid(parsed.growthVows,growthVows.length);
+    parsed.weekdayVows=resizeVowGrid(parsed.weekdayVows,weekdayVows.length);
+    parsed.damage=resizeVowGrid(parsed.damage,damageStates.length);
+    parsed.lightSessionVows=resizeVowGrid(parsed.lightSessionVows,lightSessionVows.length);
+    parsed.recoveryVows=resizeVowGrid(parsed.recoveryVows,recoveryVows.length);
+    parsed.recoveryDamage=resizeVowGrid(parsed.recoveryDamage,recoveryDamageStates.length);
     if(typeof parsed.streak!=="number") parsed.streak=cleanCountFromStatuses(parsed.statuses);
     if(typeof parsed.bestStreak!=="number") parsed.bestStreak=parsed.streak;
 if(!parsed.vowTallies) parsed.vowTallies={};
@@ -2128,9 +2133,7 @@ if(!parsed.gateAnswers || parsed.gateAnswers.length!==gateQuestions.length){
 }
 if(typeof parsed.readinessScore==="undefined") parsed.readinessScore=null;
 if(typeof parsed.readinessWeather==="undefined") parsed.readinessWeather=null;
-if(!parsed.damageProtocolVows || parsed.damageProtocolVows.length!==6 || parsed.damageProtocolVows[0].length!==damageProtocolVows.length){
-  parsed.damageProtocolVows=Array.from({length:6},()=>Array(damageProtocolVows.length).fill(false));
-}
+parsed.damageProtocolVows=resizeVowGrid(parsed.damageProtocolVows,damageProtocolVows.length);
 
 if(!parsed.achievements) parsed.achievements={};
    if(!parsed.records) parsed.records=[];
@@ -4838,6 +4841,7 @@ function showImportSave(){
 
 function restoreSaveData(){
   const box=document.getElementById("importBox");
+
   if(!box) return;
 
   try{
@@ -4850,47 +4854,104 @@ function restoreSaveData(){
 
     state=imported;
 
+// Keep restored weekly progress attached to the current visible week.
+// Without this, loadState() may treat the imported save as an old week
+// and reset the SUN-FRI progress bar after reload.
+state.weekKey=weekKey;
+
     if(!state.achievements) state.achievements={};
-    if(!state.records) state.records=[];
-    if(!state.recoveryLog) state.recoveryLog=[];
-    if(!state.actionLog) state.actionLog=[];
-    if(!state.vault) state.vault=createFreshVault();
+if(!state.records) state.records=[];
+if(!state.recoveryLog) state.recoveryLog=[];
+if(!state.actionLog) state.actionLog=[];
+if(!state.vault) state.vault=createFreshVault();
+if(!state.vowTallies) state.vowTallies={};
+if(!state.vowMilestones) state.vowMilestones={};
+if(typeof state.combineDaysCurrent!=="number") state.combineDaysCurrent=0;
+if(typeof state.combineDaysPrevious!=="number") state.combineDaysPrevious=0;
+if(typeof state.combineLastDayKey!=="string") state.combineLastDayKey=getDayKey();
+if(typeof state.trainingDate==="undefined")
+ state.trainingDate=getDayKey();
 
-    if(!state.vowTallies) state.vowTallies={};
-    [
-      "DELETE VIDEOS → CHECK RECENTLY DELETED",
-      "START RECORDING BEFORE FIRST TRADE",
-      "LOCK RISK SETTINGS ON BOTH COMBINES",
-      "DON'T TRADE OUTSIDE ROUTINE",
-      "MAX 1 CONTRACT AT ALL TIMES",
-      "JOURNAL EVERY TRADE WITH FORMAT",
-      "MANTRA AFTER EVERY TRADE — NO EXCEPTIONS",
-      "IF STOP HIT ON FIRST ACCOUNT, SESSION OVER",
-      "MAX SIZE 1",
-      "ONE ACCOUNT ONLY",
-      "NO SCALING",
-      "NO 3PM SESSION",
-      "LOCK BOTH ACCOUNTS"
-    ].forEach(name=>{
-      if(typeof state.vowTallies[name]!=="number") state.vowTallies[name]=0;
-    });
+if(typeof state.trainingRank==="undefined")
+ state.trainingRank=0;
 
-    if(typeof state.combineDaysCurrent!=="number") state.combineDaysCurrent=0;
-    if(typeof state.combineDaysPrevious!=="number") state.combineDaysPrevious=0;
-    if(typeof state.combineLastDayKey==="undefined") state.combineLastDayKey=null;
+if(!state.trainingTargets){
+ state.trainingTargets={
+  exitStars:10,
+  breakevens:20,
+  controlledLosses:10
+ };
+}
 
-    localStorage.setItem("kaizenKnightV5",JSON.stringify(state));
+if(!state.todayDrills){
+ state.todayDrills={
+  exitStars:0,
+  breakevens:0,
+  controlledLosses:0
+ };
+}
+
+if(!state.lifetimeDrills){
+ state.lifetimeDrills={
+  exitStars:0,
+  breakevens:0,
+  controlledLosses:0
+ };
+}
+
+if(typeof state.trainingDays==="undefined")
+ state.trainingDays=0;
+
+if(typeof state.trainingCompletedDays==="undefined")
+ state.trainingCompletedDays=0;
+
+if(typeof state.trainingCompleteToday==="undefined")
+ state.trainingCompleteToday=false;
+
+if(typeof state.trainingPromotedToday==="undefined")
+ state.trainingPromotedToday=false;
+if(!Array.isArray(state.actionConditions)) state.actionConditions=[];
+if(!Array.isArray(state.actionLessons)) state.actionLessons=[];
+if(!Array.isArray(state.actionStates)) state.actionStates=[];
+if(!Array.isArray(state.actionReframes)) state.actionReframes=[];
+
+ensureVault();
+repairWeeklyStatusesFromChecklist();
+saveState();
 
     play("good");
+
     document.getElementById("statusBar").innerHTML="SAVE RESTORED";
-    setTimeout(()=>{ location.reload(); },450);
+
+    setTimeout(()=>{
+      todayIndex=getTradingDayIndex();
+      weekKey=getWeekKey();
+      state.weekKey=weekKey;
+      state.sundayVows=resizeVowRow(state.sundayVows,sundayVows.length);
+      state.growthVows=resizeVowGrid(state.growthVows,growthVows.length);
+      state.weekdayVows=resizeVowGrid(state.weekdayVows,weekdayVows.length);
+      state.damage=resizeVowGrid(state.damage,damageStates.length);
+      state.lightSessionVows=resizeVowGrid(state.lightSessionVows,lightSessionVows.length);
+      state.recoveryVows=resizeVowGrid(state.recoveryVows,recoveryVows.length);
+      state.recoveryDamage=resizeVowGrid(state.recoveryDamage,recoveryDamageStates.length);
+      state.damageProtocolVows=resizeVowGrid(state.damageProtocolVows,damageProtocolVows.length);
+      ensureDailyModeFresh();
+      resetTrainingForNewDay();
+      ensureVowTallies();
+      ensureCombineCounterFresh();
+      state.crackActive=anyDamageActive();
+      renderPowerQuote();
+      saveState();
+      showMain();
+    },450);
 
   }catch(e){
+
     play("fail");
+
     document.getElementById("statusBar").innerHTML="RESTORE FAILED";
   }
 }
-  
 ensureDailyModeFresh();
 resetTrainingForNewDay();
 ensureVowTallies();
