@@ -1113,6 +1113,17 @@ const trainingRanks=[
   "LEGEND"
 ];
 function requirePower(){ return poweredOn; }
+// v9.0.4: Today's evaluation (day-type + trade gate) must be completed
+// before CHECK/CODE/TRAIN/GALLERY are reachable from the bottom buttons.
+function gateBlockedToday(){
+  return todayIndex>=0 && !state.gateCompleted;
+}
+function requireGate(){
+  if(!gateBlockedToday()) return true;
+  play("fail");
+  showMorningGate();
+  return false;
+}
 function getTodaysVows(){ return todayIndex===0 ? sundayVows : weekdayVows; }
 function isSleepTime(){
   const now=new Date();
@@ -3551,6 +3562,7 @@ showCheck();
 
 function showCheckWithMenuSound(){
  if(!requirePower()) return;
+ if(!requireGate()) return;
   play("menu");
   showCheckRouter();
 }
@@ -3640,6 +3652,7 @@ function resetTrainingForNewDay(){
 
 function showTrain(playSound=true,restoreScroll=null){
   if(!requirePower()) return;
+  if(!requireGate()) return;
 
   resetTrainingForNewDay();
 
@@ -4021,6 +4034,7 @@ function startGateAnimation(){
 
 function showCode(){
   if(!requirePower()) return;
+  if(!requireGate()) return;
   play("menu");
   stopPet();
   stopFirework();
@@ -4438,6 +4452,7 @@ function actionReportSectionHTML(title,list,field){
 
 function showGallery(mode="trophies"){
   if(!requirePower()) return;
+  if(!requireGate()) return;
   play("menu");
   stopPet();
   stopFirework();
