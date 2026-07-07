@@ -4494,6 +4494,17 @@ function showGallery(mode="trophies"){
     html+="<div class='record-line'>REST THIS WEEK: "+recoveryCountThisWeek()+"</div>";
     html+="<div class='record-line'>REST THIS MONTH: "+recoveryCountThisMonth()+"</div>";
 
+    if(!state.records || state.records.length<=0){
+      html+="<div class='small-note' style='margin-top:14px;'>NO WEEK RECORDS YET</div>";
+    }else{
+      for(let i=state.records.length-1;i>=0;i--){
+        let r=state.records[i];
+        let rookText="";
+        for(let j=0;j<r.rooks;j++) rookText+="♜";
+        html+="<div class='record-line'>"+r.date+" "+r.grade+" "+rookText+"</div>";
+      }
+    }
+
     html+="<div class='section-label'>62-DAY VOW STARS</div>";
     let starVows=getVaultVows();
     let anyStar=false;
@@ -4506,17 +4517,6 @@ function showGallery(mode="trophies"){
     }
     if(!anyStar){
       html+="<div class='small-note'>NO 62-DAY VOW STARS YET</div>";
-    }
-
-    if(!state.records || state.records.length<=0){
-      html+="<div class='small-note' style='margin-top:14px;'>NO WEEK RECORDS YET</div>";
-    }else{
-      for(let i=state.records.length-1;i>=0;i--){
-        let r=state.records[i];
-        let rookText="";
-        for(let j=0;j<r.rooks;j++) rookText+="♜";
-        html+="<div class='record-line'>"+r.date+" "+r.grade+" "+rookText+"</div>";
-      }
     }
 
     html+="</div></div>";
